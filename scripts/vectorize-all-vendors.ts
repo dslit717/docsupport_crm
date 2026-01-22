@@ -85,6 +85,7 @@ async function vectorizeAllVendors() {
       id,
       name,
       description_md,
+      address,
       city,
       state,
       vendor_category_map (
@@ -148,7 +149,10 @@ async function vectorizeAllVendors() {
       // 업체 업데이트
       const { error: updateError } = await supabase
         .from("vendors")
-        .update({ search_embedding: embedding })
+        .update({ 
+          search_embedding: `[${embedding.join(",")}]`,
+          updated_at: new Date().toISOString()
+        })
         .eq("id", vendor.id);
 
       if (updateError) {
