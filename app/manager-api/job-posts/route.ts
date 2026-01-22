@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   createErrorResponse,
   parsePaginationParams,
   QueryBuilder,
 } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // GET - 관리자용 구인글 목록 조회 (모든 상태 포함)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const { searchParams } = request.nextUrl;
 
     // 파라미터 파싱
@@ -57,7 +61,10 @@ export async function GET(request: NextRequest) {
 // PUT - 구인글 상태 변경 (관리자용)
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const body = await request.json();
     const { id, status, paid_ad_approved, paid_ad_approved_by } = body;
 
@@ -101,7 +108,10 @@ export async function PUT(request: NextRequest) {
 // DELETE - 구인글 삭제 (관리자용)
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get("id");
 

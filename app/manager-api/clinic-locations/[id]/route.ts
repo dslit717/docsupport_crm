@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createErrorResponse } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // PUT - 개원자리 수정
 export async function PUT(
@@ -8,7 +9,10 @@ export async function PUT(
   { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const body = await request.json();
     const resolvedParams = params instanceof Promise ? await params : params;
     const id = resolvedParams.id;
@@ -59,7 +63,10 @@ export async function DELETE(
   { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const resolvedParams = params instanceof Promise ? await params : params;
     const id = resolvedParams.id;
 

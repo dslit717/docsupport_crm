@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   createErrorResponse,
   parsePaginationParams,
 } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // GET - 세미나 목록 조회
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const { searchParams } = request.nextUrl;
 
     const { page, limit } = parsePaginationParams(searchParams);
@@ -62,7 +66,10 @@ export async function GET(request: NextRequest) {
 // POST - 새 세미나 생성
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const body = await request.json();
 
     const { data: seminar, error } = await supabase

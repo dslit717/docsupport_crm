@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   createErrorResponse,
   createSuccessResponse,
 } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 /**
  * GET: 특정 유저 상세 조회
@@ -13,21 +14,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const { id } = await params;
-    console.log("[유저 조회] 요청 ID:", id);
-
-    // 환경 변수 확인
-    const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
-    console.log("[유저 조회] Service Role Key 설정됨:", hasServiceKey);
-
-    if (!hasServiceKey) {
-      return createErrorResponse(
-        new Error("SUPABASE_SERVICE_ROLE_KEY 환경 변수가 설정되지 않았습니다."),
-        500
-      );
-    }
-
-    const supabase = createSupabaseAdminClient();
+    const supabase = await createSupabaseServerClient();
 
     // user_management_view에서 조회
     const { data, error } = await supabase
@@ -66,9 +57,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    console.log("[유저 업데이트] 요청 ID:", id);
-
-    const supabase = createSupabaseAdminClient();
+    const supabase = await createSupabaseServerClient();
     const body = await request.json();
     console.log("[유저 업데이트] 요청 데이터:", body);
 

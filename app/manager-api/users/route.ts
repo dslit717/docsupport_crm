@@ -1,21 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   createErrorResponse,
   createSuccessResponse,
   parsePaginationParams,
 } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 /**
  * GET: 유저 목록 조회
  * 
  * user_management_view를 활용하여 users + user_info 통합 조회
- * Admin 클라이언트 사용 (모든 유저 조회를 위해 RLS 우회)
  */
 export async function GET(request: NextRequest) {
   try {
-    // Admin 클라이언트 사용 (RLS 우회)
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseServerClient();
     const { searchParams } = request.nextUrl;
     
     const { page, limit } = parsePaginationParams(searchParams);

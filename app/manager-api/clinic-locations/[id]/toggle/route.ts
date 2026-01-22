@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // PATCH - 개원자리 활성 상태만 변경
 export async function PATCH(
@@ -7,6 +8,9 @@ export async function PATCH(
   { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const body = await request.json();
     const resolvedParams = params instanceof Promise ? await params : params;
     const id = resolvedParams.id;
@@ -25,7 +29,7 @@ export async function PATCH(
       );
     }
 
-    const supabase = createSupabaseAdminClient();
+    const supabase = await createSupabaseServerClient();
     const { data: location, error } = await supabase
       .from("clinic_locations")
       .update({ is_active: body.is_active })
