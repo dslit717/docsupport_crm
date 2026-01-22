@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -8,10 +9,14 @@ import {
   generateSlug,
   validateRequiredFields,
 } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // GET: 카테고리 목록 조회 (연결된 업체 수 포함)
 export async function GET(request: NextRequest) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const supabase = await createSupabaseServerClient();
     const { searchParams } = new URL(request.url);
 
@@ -60,6 +65,9 @@ export async function GET(request: NextRequest) {
 // POST: 새 카테고리 생성
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const supabase = await createSupabaseServerClient();
     const body = await request.json();
 

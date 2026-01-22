@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // GET: 특정 카테고리 조회 (연결된 업체 목록 포함)
 export async function GET(
@@ -7,6 +8,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const supabase = await createSupabaseServerClient();
     const { id } = params;
 
@@ -71,6 +75,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const supabase = await createSupabaseServerClient();
     const { id } = params;
     const body = await request.json();
@@ -124,6 +131,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    // 인증된 사용자는 Server 클라이언트로 충분 (RLS 정책이 인증된 사용자 허용)
     const supabase = await createSupabaseServerClient();
     const { id } = params;
 

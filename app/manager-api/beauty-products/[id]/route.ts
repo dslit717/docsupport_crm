@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // PUT - 제품 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const supabase = await createSupabaseServerClient();
+    const { id } = await Promise.resolve(params);
     const body = await request.json();
 
     // 이미지는 별도 이미지 관리 페이지에서 처리 (ProductDetailImage는 업데이트하지 않음)
@@ -20,7 +26,7 @@ export async function PUT(
         ProductDetail: body.description,
         is_active: body.is_active !== undefined ? body.is_active : true,
       })
-      .eq("id", params.id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -38,13 +44,13 @@ export async function PUT(
       await supabase
         .from("beauty_product_category_map_uuid")
         .delete()
-        .eq("product_id", params.id);
+        .eq("product_id", id);
 
       // 새 매핑 추가
       if (body.category_ids.length > 0) {
         const categoryMappings = body.category_ids.map(
           (categoryId: string) => ({
-            product_id: params.id,
+            product_id: id,
             category_id: categoryId,
           })
         );
@@ -61,7 +67,7 @@ export async function PUT(
       const { data: existingMappings } = await supabase
         .from("beauty_product_links_map_uuid")
         .select("link_id")
-        .eq("product_id", params.id);
+        .eq("product_id", id);
 
       // 기존 링크 삭제
       if (existingMappings && existingMappings.length > 0) {
@@ -71,7 +77,7 @@ export async function PUT(
         await supabase
           .from("beauty_product_links_map_uuid")
           .delete()
-          .eq("product_id", params.id);
+          .eq("product_id", id);
 
         // 링크 삭제
         await supabase.from("beauty_product_links").delete().in("id", linkIds);
@@ -96,7 +102,7 @@ export async function PUT(
           if (newLink) {
             await supabase.from("beauty_product_links_map_uuid").insert([
               {
-                product_id: params.id,
+                product_id: id,
                 link_id: newLink.id,
               },
             ]);
@@ -128,22 +134,27 @@ export async function PUT(
 // DELETE - 제품 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    // 인증된 사용자는 Server 클라이언트로 충분 (RLS 정책이 인증된 사용자 허용)
     const supabase = await createSupabaseServerClient();
+    const { id } = await Promise.resolve(params);
 
     // 관련 매핑 삭제
     await supabase
       .from("beauty_product_category_map_uuid")
       .delete()
-      .eq("product_id", params.id);
+      .eq("product_id", id);
 
     // 링크 매핑 조회 및 삭제
     const { data: linkMappings } = await supabase
       .from("beauty_product_links_map_uuid")
       .select("link_id")
-      .eq("product_id", params.id);
+      .eq("product_id", id);
 
     if (linkMappings && linkMappings.length > 0) {
       const linkIds = linkMappings.map((m) => m.link_id);
@@ -152,7 +163,7 @@ export async function DELETE(
       await supabase
         .from("beauty_product_links_map_uuid")
         .delete()
-        .eq("product_id", params.id);
+        .eq("product_id", id);
 
       // 링크 삭제
       await supabase.from("beauty_product_links").delete().in("id", linkIds);
@@ -162,7 +173,7 @@ export async function DELETE(
     const { error } = await supabase
       .from("beauty_products")
       .delete()
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (error) {
       console.error("Error deleting product:", error);

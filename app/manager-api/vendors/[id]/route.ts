@@ -7,6 +7,7 @@ import {
   generateSlug,
   updateRelations,
 } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // GET: 특정 업체 조회
 export async function GET(
@@ -50,8 +51,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Admin 클라이언트 사용 (RLS 우회)
-    const supabase = createSupabaseAdminClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    // 인증된 사용자는 Server 클라이언트로 충분 (RLS 정책이 인증된 사용자 허용)
+    const supabase = await createSupabaseServerClient();
     const { id } = await params;
     const body = await request.json();
 
@@ -149,6 +153,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const supabase = await createSupabaseServerClient();
     const { id } = await params;
 

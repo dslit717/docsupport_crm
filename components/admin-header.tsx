@@ -1,12 +1,51 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface AdminHeaderProps {
   currentPath: string;
 }
 
 export default function AdminHeader({ currentPath }: AdminHeaderProps) {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
+    // 현재 사용자 정보 가져오기
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    // 인증 상태 변화 감지
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
+
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   const navItems = [
     { href: "/manager/users", label: "유저 관리" },
     { href: "/manager/vendors", label: "업체 관리" },
@@ -31,7 +70,7 @@ export default function AdminHeader({ currentPath }: AdminHeaderProps) {
           </Link>
         </div>
 
-        <nav className="flex items-center space-x-6">
+        <nav className="flex items-center space-x-6 flex-1">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -46,6 +85,19 @@ export default function AdminHeader({ currentPath }: AdminHeaderProps) {
             </Link>
           ))}
         </nav>
+
+        <div className="flex items-center gap-2">
+          {!loading && user && (
+            <>
+              <span className="text-sm text-muted-foreground">
+                {user.email || user.user_metadata?.email || "사용자"}
+              </span>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
