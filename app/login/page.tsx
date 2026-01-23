@@ -1,22 +1,24 @@
 "use client";
 
-import { useCallback, useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, FormEvent, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const searchParams = useSearchParams();
-  const redirectedFrom = searchParams.get("redirectedFrom") || "/";
+  const router = useRouter();
+  const redirectedFrom = searchParams.get("redirectedFrom") || "/manager";
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const onLoginKakao = useCallback(async () => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
 
@@ -28,51 +30,35 @@ function LoginForm() {
         return;
       }
 
-      // 현재 브라우저 origin 사용 (실제 접속 URL)
-      const origin =
-        typeof window !== "undefined" ? window.location.origin : "";
+      // 아이디를 이메일 형식으로 변환 (Supabase는 이메일 형식이 필요)
+      // admin -> admin@test.com
+      const emailToUse = username.includes("@") 
+        ? username 
+        : `${username}@test.com`;
 
-      console.log("Starting Kakao OAuth...");
-      console.log("Current Origin:", origin);
-      console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-
-      // Supabase Auth를 통한 리다이렉트
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const callbackUrl = `${origin}/auth/callback`;
-
-      // Supabase Auth를 거치는 redirectTo
-      const redirectTo = `${supabaseUrl}/auth/v1/callback?redirect_to=${encodeURIComponent(
-        callbackUrl
-      )}`;
-
-      console.log("Callback URL:", callbackUrl);
-      console.log("Full Redirect URL:", redirectTo);
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "kakao",
-        options: {
-          redirectTo,
-        },
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: emailToUse,
+        password,
       });
 
-      console.log("OAuth response:", { data, error });
-
-      if (error) {
-        console.error("OAuth error:", error);
-        setError(error.message);
+      if (signInError) {
+        setError(signInError.message);
         setLoading(false);
         return;
       }
 
-      // 성공 시 자동으로 리다이렉트됨
+      if (data.session) {
+        // 로그인 성공 시 리다이렉트
+        router.push(redirectedFrom);
+        router.refresh();
+      }
     } catch (e) {
-      console.error("Unexpected error:", e);
       setError(
         e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다"
       );
       setLoading(false);
     }
-  }, []);
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50">
@@ -80,35 +66,51 @@ function LoginForm() {
         <CardContent className="space-y-6 p-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">관리자 로그인</h1>
-            <p className="text-sm text-gray-500">카카오 계정으로 로그인하세요</p>
           </div>
 
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
               <div className="font-medium">로그인 오류</div>
-              <div className="mt-1 opacity-90">{error}</div>
             </div>
           )}
 
-          <button
-            onClick={onLoginKakao}
-            disabled={loading}
-            className="w-full h-14 rounded-lg font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98]"
-            style={{
-              backgroundColor: '#FEE500',
-              color: '#000000',
-            }}
-          >
-            {loading ? (
-              <>
-                <span>카카오로 이동 중...</span>
-              </>
-            ) : (
-              <>
-                <span>카카오 로그인</span>
-              </>
-            )}
-          </button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">아이디</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="아이디를 입력하세요"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                disabled={loading}
+                autoComplete="username"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">비밀번호</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="비밀번호를 입력하세요"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                autoComplete="current-password"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 text-base font-semibold"
+            >
+              {loading ? "로그인 중..." : "로그인"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>

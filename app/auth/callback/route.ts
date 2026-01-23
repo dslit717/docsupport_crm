@@ -2,7 +2,7 @@
  * OAuth 인증 콜백 핸들러
  *
  * 이 파일은 Supabase OAuth 인증 흐름의 콜백을 처리합니다.
- * 카카오, 구글 등 소셜 로그인 후 사용자가 리다이렉트되는 엔드포인트입니다.
+ * 소셜 로그인 후 사용자가 리다이렉트되는 엔드포인트입니다.
  */
 
 import { NextResponse, type NextRequest } from "next/server";

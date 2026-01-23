@@ -2,23 +2,6 @@
 import { createSupabaseBrowserClient } from './client'
 
 export const authService = {
-  // 로그인
-  async signInWithKakao() {
-    const supabase = createSupabaseBrowserClient()
-    if (!supabase) {
-      throw new Error("Supabase 클라이언트를 초기화할 수 없습니다.")
-    }
-    
-    const origin = window.location.origin
-    
-    return await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-      },
-    })
-  },
-
   // 로그아웃
   async signOut() {
     const supabase = createSupabaseBrowserClient()
