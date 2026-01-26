@@ -103,9 +103,6 @@ function SignupForm() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               관리자 회원가입
             </h1>
-            <p className="text-sm text-gray-600">
-              새로운 관리자 계정을 생성합니다
-            </p>
           </div>
 
           {error && (
