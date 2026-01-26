@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -42,7 +43,14 @@ function LoginForm() {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        // 에러 메시지를 더 명확하게 표시
+        if (signInError.message.includes("Invalid login credentials") || signInError.code === "invalid_credentials") {
+          setError("이메일 또는 비밀번호가 올바르지 않습니다. 회원가입 시 사용한 이메일 주소를 정확히 입력해주세요.");
+        } else if (signInError.message.includes("Email not confirmed")) {
+          setError("이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.");
+        } else {
+          setError(signInError.message);
+        }
         setLoading(false);
         return;
       }
@@ -80,7 +88,7 @@ function LoginForm() {
               <Input
                 id="username"
                 type="text"
-                placeholder="아이디를 입력하세요"
+                placeholder="이메일 또는 아이디를 입력하세요"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -111,6 +119,16 @@ function LoginForm() {
               {loading ? "로그인 중..." : "로그인"}
             </Button>
           </form>
+
+          <div className="text-center text-sm text-gray-600">
+            계정이 없으신가요?{" "}
+            <Link
+              href="/signup"
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              회원가입
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -37,6 +37,7 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isLogin = pathname.startsWith("/login");
+  const isSignup = pathname.startsWith("/signup");
   const isApi = pathname.startsWith("/api");
   const isAuth = pathname.startsWith("/auth");
   const isManagerApi = pathname.startsWith("/manager-api");
@@ -56,14 +57,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Manager 페이지는 인증 필수
-  if (isManager && !isLogin && !session) {
+  if (isManager && !isLogin && !isSignup && !session) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("redirectedFrom", pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 로그인 페이지에 이미 인증된 경우 홈으로 리다이렉트
-  if (isLogin && session) {
+  // 로그인/회원가입 페이지에 이미 인증된 경우 홈으로 리다이렉트
+  if ((isLogin || isSignup) && session) {
     return NextResponse.redirect(new URL("/manager", request.url));
   }
 
