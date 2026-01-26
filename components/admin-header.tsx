@@ -63,14 +63,14 @@ export default function AdminHeader({ currentPath }: AdminHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center px-4">
-        <div className="mr-4 flex">
-          <Link href="/manager" className="mr-6 flex items-center space-x-2">
+      <div className="container mx-auto flex h-14 items-center px-4 relative">
+        <div className="flex">
+          <Link href="/manager" className="flex items-center space-x-2">
             <span className="font-bold text-xl">관리자</span>
           </Link>
         </div>
 
-        <nav className="flex items-center space-x-6 flex-1">
+        <nav className="flex items-center space-x-6 flex-1 justify-center">
           {navItems.map((item) => (
             <Link
               key={item.href}
