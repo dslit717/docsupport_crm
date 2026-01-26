@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -56,8 +57,11 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
     const { id } = await params;
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const body = await request.json();
     console.log("[유저 업데이트] 요청 데이터:", body);
 

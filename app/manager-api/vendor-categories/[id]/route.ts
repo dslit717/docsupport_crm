@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // GET: 특정 카테고리 조회 (연결된 업체 목록 포함)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
     const supabase = await createSupabaseServerClient();
-    const { id } = params;
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
 
     // 카테고리 정보 조회
     const { data: category, error: categoryError } = await supabase
@@ -72,24 +74,46 @@ export async function GET(
 // PUT: 카테고리 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
-    const { id } = params;
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
+    
+    console.log("[카테고리 수정] params:", params);
+    console.log("[카테고리 수정] resolvedParams:", resolvedParams);
+    console.log("[카테고리 수정] id:", id);
+    
+    if (!id || id === "undefined") {
+      console.error("[카테고리 수정] ID가 없습니다:", id);
+      return NextResponse.json(
+        { error: "카테고리 ID가 필요합니다." },
+        { status: 400 }
+      );
+    }
+    
     const body = await request.json();
 
     const { name, description, is_active } = body;
 
     // 업데이트 데이터 준비
     let updateData: any = {
-      description,
-      is_active,
       updated_at: new Date().toISOString(),
     };
+
+    // description이 제공된 경우만 업데이트 (빈 문자열은 null로 처리)
+    if (description !== undefined) {
+      updateData.description = description || null;
+    }
+
+    // is_active가 제공된 경우만 업데이트
+    if (is_active !== undefined) {
+      updateData.is_active = is_active;
+    }
 
     // 이름이 변경된 경우 슬러그도 업데이트
     if (name) {
@@ -128,15 +152,15 @@ export async function PUT(
 // DELETE: 카테고리 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    // 인증된 사용자는 Server 클라이언트로 충분 (RLS 정책이 인증된 사용자 허용)
-    const supabase = await createSupabaseServerClient();
-    const { id } = params;
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
 
     // 연결된 업체의 카테고리 매핑 삭제 (미지정으로 변경)
     const { error: mapError } = await supabase

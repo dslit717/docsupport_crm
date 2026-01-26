@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createErrorResponse,
   parsePaginationParams,
@@ -64,7 +65,7 @@ export async function PUT(request: NextRequest) {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const body = await request.json();
     const { id, status, paid_ad_approved, paid_ad_approved_by } = body;
 
@@ -111,7 +112,7 @@ export async function DELETE(request: NextRequest) {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get("id");
 

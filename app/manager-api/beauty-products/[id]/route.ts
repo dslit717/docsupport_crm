@@ -12,7 +12,7 @@ export async function PUT(
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const { id } = await Promise.resolve(params);
     const body = await request.json();
 
@@ -140,8 +140,7 @@ export async function DELETE(
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    // 인증된 사용자는 Server 클라이언트로 충분 (RLS 정책이 인증된 사용자 허용)
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const { id } = await Promise.resolve(params);
 
     // 관련 매핑 삭제

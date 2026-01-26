@@ -214,7 +214,9 @@ export default function VendorCategoryManagementPage() {
         resetForm();
         loadCategories();
       } else {
-        alert(`오류: ${result.error}`);
+        const errorMsg = result.error || result.details || "알 수 없는 오류";
+        console.error("카테고리 저장 오류:", result);
+        alert(`오류: ${errorMsg}`);
       }
     } catch (error) {
       console.error("카테고리 저장 오류:", error);
@@ -235,7 +237,9 @@ export default function VendorCategoryManagementPage() {
         alert(result.message);
         loadCategories();
       } else {
-        alert(`오류: ${result.error}`);
+        const errorMsg = result.error || result.details || "알 수 없는 오류";
+        console.error("카테고리 삭제 오류:", result);
+        alert(`오류: ${errorMsg}`);
       }
     } catch (error) {
       console.error("카테고리 삭제 오류:", error);

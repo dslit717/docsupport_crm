@@ -57,8 +57,7 @@ export async function PUT(
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    // 인증된 사용자는 Server 클라이언트로 충분 (RLS 정책이 인증된 사용자 허용)
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const { id } = await params;
     const body = await request.json();
 
@@ -159,7 +158,7 @@ export async function DELETE(
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const { id } = await params;
 
     // 관련 데이터 삭제 (CASCADE가 없는 경우를 대비)

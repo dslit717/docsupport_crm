@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createErrorResponse,
   parsePaginationParams,
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const body = await request.json();
 
     const { data: seminar, error } = await supabase

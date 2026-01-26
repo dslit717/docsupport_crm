@@ -1,13 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // PUT - 카테고리 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
+    
+    if (!id || id === "undefined") {
+      return NextResponse.json(
+        { error: "카테고리 ID가 필요합니다." },
+        { status: 400 }
+      );
+    }
+    
     const body = await request.json();
 
     const { data: category, error } = await supabase
@@ -20,7 +35,7 @@ export async function PUT(
         show_order: body.display_order,
         is_main_category: body.is_active,
       })
-      .eq("id", params.id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -56,16 +71,28 @@ export async function PUT(
 // DELETE - 카테고리 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
+    
+    if (!id || id === "undefined") {
+      return NextResponse.json(
+        { error: "카테고리 ID가 필요합니다." },
+        { status: 400 }
+      );
+    }
 
     // 이 카테고리를 사용하는 제품이 있는지 확인
     const { data: mappings, error: checkError } = await supabase
       .from("beauty_product_category_map_uuid")
       .select("id")
-      .eq("category_id", params.id)
+      .eq("category_id", id)
       .limit(1);
 
     if (checkError) {
@@ -86,7 +113,7 @@ export async function DELETE(
     const { error } = await supabase
       .from("beauty_product_category")
       .delete()
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (error) {
       console.error("Error deleting category:", error);

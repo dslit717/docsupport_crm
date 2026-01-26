@@ -90,7 +90,7 @@ export default function AdminHeader({ currentPath }: AdminHeaderProps) {
           {!loading && user && (
             <>
               <span className="text-sm text-muted-foreground">
-                {user.email || user.user_metadata?.email || "사용자"}
+                {user.user_metadata?.name || user.user_metadata?.full_name || "관리자"}
               </span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 로그아웃

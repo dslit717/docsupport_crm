@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createErrorResponse } from "@/lib/server/api-utils";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 /**
  * GET - 특정 연락처 조회
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { id } = params;
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
 
     const { data, error } = await supabase
       .from("beauty_product_contacts_map_uuid")
@@ -41,29 +47,37 @@ export async function GET(
 
     if (error) throw error;
 
-    const contact = {
+    // 타입 안전성을 위해 배열인 경우 첫 번째 요소 사용
+    const product = Array.isArray(data.beauty_products) 
+      ? data.beauty_products[0] 
+      : data.beauty_products;
+    const contact = Array.isArray(data.beauty_product_contacts)
+      ? data.beauty_product_contacts[0]
+      : data.beauty_product_contacts;
+
+    const result = {
       id: data.id,
       product_id: data.product_id,
       contact_id: data.contact_id,
       product: {
-        id: data.beauty_products?.id,
-        name: data.beauty_products?.ProductName,
-        name_en: data.beauty_products?.ProductNameEN,
-        brand: data.beauty_products?.ProductManufacturer,
-        image_url: data.beauty_products?.ProductDetailImage,
+        id: product?.id,
+        name: product?.ProductName,
+        name_en: product?.ProductNameEN,
+        brand: product?.ProductManufacturer,
+        image_url: product?.ProductDetailImage,
       },
       contact: {
-        id: data.beauty_product_contacts?.id,
-        company_name_ko: data.beauty_product_contacts?.company_name_ko,
-        company_name_en: data.beauty_product_contacts?.company_name_en,
-        contact_number: data.beauty_product_contacts?.contact_number,
-        company_homepage: data.beauty_product_contacts?.company_homepage,
-        person_in_charge: data.beauty_product_contacts?.person_in_charge,
+        id: contact?.id,
+        company_name_ko: contact?.company_name_ko,
+        company_name_en: contact?.company_name_en,
+        contact_number: contact?.contact_number,
+        company_homepage: contact?.company_homepage,
+        person_in_charge: contact?.person_in_charge,
       },
       created_at: data.created_at,
     };
 
-    return NextResponse.json({ data: contact });
+    return NextResponse.json({ data: result });
   } catch (error) {
     return createErrorResponse(error, 500, "연락처 조회 오류");
   }
@@ -74,11 +88,15 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { id } = params;
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
     const body = await request.json();
 
     const {
@@ -128,11 +146,15 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { id } = params;
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseAdminClient();
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const { id } = resolvedParams;
 
     // 매핑 정보 조회
     const { data: mapping, error: mappingError } = await supabase

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { checkAdminAuth } from "@/lib/server/auth-utils";
 
 // PUT: 광고 상태 설정
 export async function PUT(
@@ -7,7 +9,10 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
+    const authResult = await checkAdminAuth();
+    if (authResult.error) return authResult.error;
+
+    const supabase = await createSupabaseAdminClient();
     const { id } = params;
     const body = await request.json();
 

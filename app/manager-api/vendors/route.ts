@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     const authResult = await checkAdminAuth();
     if (authResult.error) return authResult.error;
 
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseAdminClient();
     const body = await request.json();
 
     const {
