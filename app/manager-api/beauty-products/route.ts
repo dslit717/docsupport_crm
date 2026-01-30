@@ -147,6 +147,36 @@ export async function POST(request: NextRequest) {
       await addProductLinks(supabase, product.id, body.links);
     }
 
+    // 연락처 정보 추가
+    if (body.contacts && Array.isArray(body.contacts) && body.contacts.length > 0) {
+      for (const contact of body.contacts) {
+        if (contact.company_name_ko) {
+          const { data: newContact } = await supabase
+            .from("beauty_product_contacts")
+            .insert([
+              {
+                company_name_ko: contact.company_name_ko,
+                company_name_en: contact.company_name_en || null,
+                contact_number: contact.contact_number || null,
+                company_homepage: contact.company_homepage || null,
+                person_in_charge: contact.person_in_charge || null,
+              },
+            ])
+            .select()
+            .single();
+
+          if (newContact) {
+            await supabase.from("beauty_product_contacts_map_uuid").insert([
+              {
+                product_id: product.id,
+                contact_id: newContact.id,
+              },
+            ]);
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -195,6 +225,7 @@ async function enrichProductsWithDetails(supabase: any, products: any[]) {
         .eq("product_id", product.id);
 
       let links: Array<{ name: string; url: string; type: string }> = [];
+      
       if (linkMappings && linkMappings.length > 0) {
         links = linkMappings
           .filter((m: any) => m.beauty_product_links)
@@ -208,6 +239,37 @@ async function enrichProductsWithDetails(supabase: any, products: any[]) {
           });
       }
 
+      // 연락처 정보
+      const { data: contactMappings } = await supabase
+        .from("beauty_product_contacts_map_uuid")
+        .select("contact_id, beauty_product_contacts(*)")
+        .eq("product_id", product.id);
+
+      let contacts: Array<{
+        id: string;
+        company_name_ko: string;
+        company_name_en?: string;
+        contact_number?: string;
+        company_homepage?: string;
+        person_in_charge?: string;
+      }> = [];
+      
+      if (contactMappings && contactMappings.length > 0) {
+        contacts = contactMappings
+          .filter((m: any) => m.beauty_product_contacts)
+          .map((m: any) => {
+            const contact = m.beauty_product_contacts as any;
+            return {
+              id: contact.id,
+              company_name_ko: contact.company_name_ko || "",
+              company_name_en: contact.company_name_en || "",
+              contact_number: contact.contact_number || "",
+              company_homepage: contact.company_homepage || "",
+              person_in_charge: contact.person_in_charge || "",
+            };
+          });
+      }
+
       return {
         id: product.id,
         product_id: product.ProductID,
@@ -217,6 +279,7 @@ async function enrichProductsWithDetails(supabase: any, products: any[]) {
         category_ids: mappings?.map((m: any) => m.category_id) || [],
         description: product.ProductDetail,
         links: links,
+        contacts: contacts,
         image_name: product.ProductDetailImage,
         is_active: product.is_active ?? true,
         categories: categories,

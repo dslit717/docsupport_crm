@@ -29,6 +29,14 @@ interface ProductFormDialogProps {
     categoryIds: string[];
     description: string;
     links: Array<{ name: string; url: string; type: string }>;
+    contacts: Array<{
+      id?: string;
+      company_name_ko: string;
+      company_name_en?: string;
+      contact_number?: string;
+      company_homepage?: string;
+      person_in_charge?: string;
+    }>;
     isActive: boolean;
   };
   categories: Array<{ id: string; name: string }>;
@@ -85,6 +93,36 @@ export default function ProductFormDialog({
     const updatedLinks = [...formData.links];
     updatedLinks[index] = { ...updatedLinks[index], [field]: value };
     onChange("links", updatedLinks);
+  };
+
+  const handleAddContact = () => {
+    onChange("contacts", [
+      ...formData.contacts,
+      {
+        company_name_ko: "",
+        company_name_en: "",
+        contact_number: "",
+        company_homepage: "",
+        person_in_charge: "",
+      },
+    ]);
+  };
+
+  const handleRemoveContact = (index: number) => {
+    onChange(
+      "contacts",
+      formData.contacts.filter((_, i) => i !== index)
+    );
+  };
+
+  const handleUpdateContact = (
+    index: number,
+    field: string,
+    value: string
+  ) => {
+    const updatedContacts = [...formData.contacts];
+    updatedContacts[index] = { ...updatedContacts[index], [field]: value };
+    onChange("contacts", updatedContacts);
   };
 
   return (
@@ -188,6 +226,142 @@ export default function ProductFormDialog({
               onChange={(e) => onChange("description", e.target.value)}
               placeholder="제품 설명을 입력하세요"
             />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-sm font-medium">판매/문의처</label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddContact}
+                className="gap-1"
+              >
+                <Plus size={14} />
+                연락처 추가
+              </Button>
+            </div>
+
+            {formData.contacts.length > 0 ? (
+              <div className="space-y-3">
+                {formData.contacts.map((contact, index) => (
+                  <div
+                    key={index}
+                    className="p-3 border rounded-md bg-gray-50 space-y-2"
+                  >
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-medium text-gray-600">
+                        연락처 #{index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveContact(index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs text-gray-600">
+                          회사명 (한글) *
+                        </label>
+                        <Input
+                          value={contact.company_name_ko}
+                          onChange={(e) =>
+                            handleUpdateContact(
+                              index,
+                              "company_name_ko",
+                              e.target.value
+                            )
+                          }
+                          placeholder="회사명을 입력하세요"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">
+                          회사명 (영문)
+                        </label>
+                        <Input
+                          value={contact.company_name_en || ""}
+                          onChange={(e) =>
+                            handleUpdateContact(
+                              index,
+                              "company_name_en",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Company Name"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs text-gray-600">
+                          연락처
+                        </label>
+                        <Input
+                          value={contact.contact_number || ""}
+                          onChange={(e) =>
+                            handleUpdateContact(
+                              index,
+                              "contact_number",
+                              e.target.value
+                            )
+                          }
+                          placeholder="전화번호 또는 이메일"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">
+                          담당자
+                        </label>
+                        <Input
+                          value={contact.person_in_charge || ""}
+                          onChange={(e) =>
+                            handleUpdateContact(
+                              index,
+                              "person_in_charge",
+                              e.target.value
+                            )
+                          }
+                          placeholder="담당자 이름"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-gray-600">
+                        회사 홈페이지
+                      </label>
+                      <Input
+                        value={contact.company_homepage || ""}
+                        onChange={(e) =>
+                          handleUpdateContact(
+                            index,
+                            "company_homepage",
+                            e.target.value
+                          )
+                        }
+                        placeholder="https://..."
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 border-2 border-dashed rounded-md text-gray-400">
+                연락처가 없습니다. "연락처 추가" 버튼을 클릭하세요.
+              </div>
+            )}
           </div>
 
           <div>

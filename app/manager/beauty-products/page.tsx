@@ -14,6 +14,14 @@ interface Product {
   category_ids?: string[];
   description?: string;
   links?: Array<{ name: string; url: string; type: string }>;
+  contacts?: Array<{
+    id: string;
+    company_name_ko: string;
+    company_name_en?: string;
+    contact_number?: string;
+    company_homepage?: string;
+    person_in_charge?: string;
+  }>;
   image_name?: string; // ProductDetailImage 필드 (이미지는 별도 페이지에서 관리)
   is_active?: boolean;
   categories?: Array<{
@@ -45,6 +53,14 @@ export default function BeautyProductsPage() {
     categoryIds: [] as string[],
     description: "",
     links: [] as Array<{ name: string; url: string; type: string }>,
+    contacts: [] as Array<{
+      id?: string;
+      company_name_ko: string;
+      company_name_en?: string;
+      contact_number?: string;
+      company_homepage?: string;
+      person_in_charge?: string;
+    }>,
     isActive: true,
   });
 
@@ -143,6 +159,7 @@ export default function BeautyProductsPage() {
       categoryIds: [],
       description: "",
       links: [],
+      contacts: [],
       isActive: true,
     });
   };
@@ -162,6 +179,7 @@ export default function BeautyProductsPage() {
       categoryIds: product.category_ids || [],
       description: product.description || "",
       links: product.links || [],
+      contacts: product.contacts || [],
       isActive: product.is_active ?? true,
     });
     setDialogMode("edit");
@@ -176,6 +194,7 @@ export default function BeautyProductsPage() {
       category_ids: formData.categoryIds,
       description: formData.description,
       links: formData.links,
+      contacts: formData.contacts,
       is_active: formData.isActive,
     };
 

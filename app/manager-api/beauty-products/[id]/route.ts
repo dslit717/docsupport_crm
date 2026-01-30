@@ -111,6 +111,92 @@ export async function PUT(
       }
     }
 
+    // 연락처 정보 업데이트
+    if (body.contacts !== undefined && Array.isArray(body.contacts)) {
+      // 기존 연락처 매핑 조회
+      const { data: existingContactMappings } = await supabase
+        .from("beauty_product_contacts_map_uuid")
+        .select("contact_id")
+        .eq("product_id", id);
+
+      // 기존 연락처 삭제
+      if (existingContactMappings && existingContactMappings.length > 0) {
+        const contactIds = existingContactMappings.map((m) => m.contact_id);
+
+        // 연락처 매핑 삭제
+        await supabase
+          .from("beauty_product_contacts_map_uuid")
+          .delete()
+          .eq("product_id", id);
+
+        // 연락처 삭제
+        await supabase
+          .from("beauty_product_contacts")
+          .delete()
+          .in("id", contactIds);
+      }
+
+      // 새 연락처 추가
+      for (const contact of body.contacts) {
+        if (contact.company_name_ko) {
+          // 기존 연락처가 있으면 업데이트, 없으면 생성
+          if (contact.id) {
+            await supabase
+              .from("beauty_product_contacts")
+              .update({
+                company_name_ko: contact.company_name_ko,
+                company_name_en: contact.company_name_en || null,
+                contact_number: contact.contact_number || null,
+                company_homepage: contact.company_homepage || null,
+                person_in_charge: contact.person_in_charge || null,
+              })
+              .eq("id", contact.id);
+
+            // 매핑이 없으면 추가
+            const { data: existingMapping } = await supabase
+              .from("beauty_product_contacts_map_uuid")
+              .select("id")
+              .eq("product_id", id)
+              .eq("contact_id", contact.id)
+              .single();
+
+            if (!existingMapping) {
+              await supabase.from("beauty_product_contacts_map_uuid").insert([
+                {
+                  product_id: id,
+                  contact_id: contact.id,
+                },
+              ]);
+            }
+          } else {
+            // 새 연락처 생성
+            const { data: newContact } = await supabase
+              .from("beauty_product_contacts")
+              .insert([
+                {
+                  company_name_ko: contact.company_name_ko,
+                  company_name_en: contact.company_name_en || null,
+                  contact_number: contact.contact_number || null,
+                  company_homepage: contact.company_homepage || null,
+                  person_in_charge: contact.person_in_charge || null,
+                },
+              ])
+              .select()
+              .single();
+
+            if (newContact) {
+              await supabase.from("beauty_product_contacts_map_uuid").insert([
+                {
+                  product_id: id,
+                  contact_id: newContact.id,
+                },
+              ]);
+            }
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
