@@ -61,85 +61,142 @@ export async function PUT(
       }
     }
 
-    // 링크 정보 업데이트 (여러 개)
     if (body.links !== undefined && Array.isArray(body.links)) {
       // 기존 링크 매핑 조회
       const { data: existingMappings } = await supabase
         .from("beauty_product_links_map_uuid")
-        .select("link_id")
+        .select("link_id, beauty_product_links(id)")
         .eq("product_id", id);
 
-      // 기존 링크 삭제
-      if (existingMappings && existingMappings.length > 0) {
-        const linkIds = existingMappings.map((m) => m.link_id);
+      const existingLinkIds = existingMappings?.map((m: any) => {
+        const link = Array.isArray(m.beauty_product_links) 
+          ? m.beauty_product_links[0] 
+          : m.beauty_product_links;
+        return link?.id;
+      }).filter(Boolean) || [];
 
-        // 링크 매핑 삭제
+      // 전달받은 링크 ID 목록 (id가 있는 경우)
+      const incomingLinkIds = body.links
+        .map((link: any) => link.id)
+        .filter(Boolean);
+
+      // 삭제할 링크 찾기 (기존에 있던 것 중 전달받지 않은 것)
+      const linkIdsToDelete = existingLinkIds.filter(
+        (existingId: string) => !incomingLinkIds.includes(existingId)
+      );
+
+      // 삭제할 링크 삭제
+      if (linkIdsToDelete.length > 0) {
         await supabase
           .from("beauty_product_links_map_uuid")
           .delete()
-          .eq("product_id", id);
+          .eq("product_id", id)
+          .in("link_id", linkIdsToDelete);
 
-        // 링크 삭제
-        await supabase.from("beauty_product_links").delete().in("id", linkIds);
+        await supabase
+          .from("beauty_product_links")
+          .delete()
+          .in("id", linkIdsToDelete);
       }
 
-      // 새 링크 추가
+      // 링크 추가/수정
       for (const link of body.links) {
         if (link.url) {
-          const { data: newLink } = await supabase
-            .from("beauty_product_links")
-            .insert([
-              {
+          if (link.id) {
+            // 기존 링크 업데이트
+            await supabase
+              .from("beauty_product_links")
+              .update({
                 link_name: link.name || "제품 링크",
                 link_type: link.type || "other",
                 link: link.url,
                 is_newtab: 1,
-              },
-            ])
-            .select()
-            .single();
+              })
+              .eq("id", link.id);
 
-          if (newLink) {
-            await supabase.from("beauty_product_links_map_uuid").insert([
-              {
-                product_id: id,
-                link_id: newLink.id,
-              },
-            ]);
+            // 매핑이 없으면 추가
+            const { data: existingMapping } = await supabase
+              .from("beauty_product_links_map_uuid")
+              .select("id")
+              .eq("product_id", id)
+              .eq("link_id", link.id)
+              .single();
+
+            if (!existingMapping) {
+              await supabase.from("beauty_product_links_map_uuid").insert([
+                {
+                  product_id: id,
+                  link_id: link.id,
+                },
+              ]);
+            }
+          } else {
+            // 새 링크 추가
+            const { data: newLink } = await supabase
+              .from("beauty_product_links")
+              .insert([
+                {
+                  link_name: link.name || "제품 링크",
+                  link_type: link.type || "other",
+                  link: link.url,
+                  is_newtab: 1,
+                },
+              ])
+              .select()
+              .single();
+
+            if (newLink) {
+              await supabase.from("beauty_product_links_map_uuid").insert([
+                {
+                  product_id: id,
+                  link_id: newLink.id,
+                },
+              ]);
+            }
           }
         }
       }
     }
+    // body.links가 undefined면 기존 링크 유지 (아무것도 하지 않음)
 
-    // 연락처 정보 업데이트
+    // 연락처 정보 업데이트 (contacts가 명시적으로 전달된 경우에만)
+    // undefined면 기존 연락처 유지, 빈 배열이면 모두 삭제, 데이터가 있으면 추가/수정/삭제
     if (body.contacts !== undefined && Array.isArray(body.contacts)) {
-      // 기존 연락처 매핑 조회 및 삭제
+      // 기존 연락처 매핑 조회
       const { data: existingContactMappings } = await supabase
         .from("beauty_product_contacts_map_uuid")
         .select("contact_id")
         .eq("product_id", id);
 
-      if (existingContactMappings && existingContactMappings.length > 0) {
-        const contactIds = existingContactMappings.map((m) => m.contact_id);
-        
-        // 매핑 삭제
+      const existingContactIds = existingContactMappings?.map((m) => m.contact_id) || [];
+
+      // 전달받은 연락처 ID 목록
+      const incomingContactIds = body.contacts
+        .map((contact: any) => contact.id)
+        .filter(Boolean);
+
+      // 삭제할 연락처 찾기 (기존에 있던 것 중 전달받지 않은 것)
+      const contactIdsToDelete = existingContactIds.filter(
+        (existingId: string) => !incomingContactIds.includes(existingId)
+      );
+
+      // 삭제할 연락처 삭제
+      if (contactIdsToDelete.length > 0) {
         await supabase
           .from("beauty_product_contacts_map_uuid")
           .delete()
-          .eq("product_id", id);
+          .eq("product_id", id)
+          .in("contact_id", contactIdsToDelete);
 
-        // 연락처 삭제
         await supabase
           .from("beauty_product_contacts")
           .delete()
-          .in("id", contactIds);
+          .in("id", contactIdsToDelete);
       }
 
-      // 새 연락처 추가 (id가 있으면 기존 것 업데이트, 없으면 새로 생성)
+      // 연락처 추가/수정
       for (const contact of body.contacts) {
         if (contact.company_name_ko) {
-          let contactId: string;
-
           if (contact.id) {
             // 기존 연락처 업데이트
             await supabase
@@ -152,7 +209,23 @@ export async function PUT(
                 person_in_charge: contact.person_in_charge || null,
               })
               .eq("id", contact.id);
-            contactId = contact.id;
+
+            // 매핑이 없으면 추가
+            const { data: existingMapping } = await supabase
+              .from("beauty_product_contacts_map_uuid")
+              .select("id")
+              .eq("product_id", id)
+              .eq("contact_id", contact.id)
+              .single();
+
+            if (!existingMapping) {
+              await supabase.from("beauty_product_contacts_map_uuid").insert([
+                {
+                  product_id: id,
+                  contact_id: contact.id,
+                },
+              ]);
+            }
           } else {
             // 새 연락처 생성
             const { data: newContact } = await supabase
@@ -169,20 +242,20 @@ export async function PUT(
               .select()
               .single();
             
-            if (!newContact) continue;
-            contactId = newContact.id;
+            if (newContact) {
+              await supabase.from("beauty_product_contacts_map_uuid").insert([
+                {
+                  product_id: id,
+                  contact_id: newContact.id,
+                },
+              ]);
+            }
           }
-
-          // 매핑 추가
-          await supabase.from("beauty_product_contacts_map_uuid").insert([
-            {
-              product_id: id,
-              contact_id: contactId,
-            },
-          ]);
         }
       }
     }
+    // body.contacts가 undefined면 기존 연락처 유지 (아무것도 하지 않음)
+    // body.contacts가 undefined면 기존 연락처 유지 (아무것도 하지 않음)
 
     return NextResponse.json({
       success: true,

@@ -224,7 +224,7 @@ async function enrichProductsWithDetails(supabase: any, products: any[]) {
         .select("link_id, beauty_product_links(*)")
         .eq("product_id", product.id);
 
-      let links: Array<{ name: string; url: string; type: string }> = [];
+      let links: Array<{ id?: string; name: string; url: string; type: string }> = [];
       
       if (linkMappings && linkMappings.length > 0) {
         links = linkMappings
@@ -232,6 +232,7 @@ async function enrichProductsWithDetails(supabase: any, products: any[]) {
           .map((m: any) => {
             const link = m.beauty_product_links as any;
             return {
+              id: link.id,
               name: link.link_name || "",
               url: link.link || "",
               type: link.link_type || "other",

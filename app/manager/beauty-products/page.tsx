@@ -13,7 +13,7 @@ interface Product {
   brand: string;
   category_ids?: string[];
   description?: string;
-  links?: Array<{ name: string; url: string; type: string }>;
+  links?: Array<{ id?: string; name: string; url: string; type: string }>;
   contacts?: Array<{
     id: string;
     company_name_ko: string;
@@ -187,16 +187,25 @@ export default function BeautyProductsPage() {
   };
 
   const handleSubmit = async () => {
-    const productData = {
+    const productData: any = {
       name: formData.name,
       name_en: formData.nameEn,
       brand: formData.brand,
       category_ids: formData.categoryIds,
       description: formData.description,
-      links: formData.links,
-      contacts: formData.contacts,
       is_active: formData.isActive,
     };
+
+    // 수정 모드일 때만 링크와 연락처 전달 (생성 모드는 항상 전달)
+    if (dialogMode === "edit") {
+      // 수정 모드에서는 항상 전달 (기존 데이터와 비교하여 추가/수정/삭제 처리)
+      productData.links = formData.links || [];
+      productData.contacts = formData.contacts || [];
+    } else {
+      // 생성 모드는 항상 전달
+      productData.links = formData.links || [];
+      productData.contacts = formData.contacts || [];
+    }
 
     try {
       const url =

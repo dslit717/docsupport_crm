@@ -28,7 +28,7 @@ interface ProductFormDialogProps {
     brand: string;
     categoryIds: string[];
     description: string;
-    links: Array<{ name: string; url: string; type: string }>;
+    links: Array<{ id?: string; name: string; url: string; type: string }>;
     contacts: Array<{
       id?: string;
       company_name_ko: string;
