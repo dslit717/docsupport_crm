@@ -24,20 +24,15 @@ export async function GET(
       .select(
         `
         *,
-        vendor_categories!inner(
-          id,
-          name,
-          slug,
-          category_id
-        ),
-        medical_departments:medical_departments(
+        vendor_categories(
           id,
           name,
           slug
         )
-      `
+      `,
+        { count: "exact" }
       )
-      .eq("vendor_categories.category_id", categoryId)
+      .eq("category_id", categoryId)
       .order(sortField, { ascending: sortDirection === "asc" });
 
     // 검색 필터
@@ -70,11 +65,8 @@ export async function GET(
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    // 먼저 총 개수를 별도로 조회
-    const { count } = await query.select("*", { count: "exact", head: true });
-
-    // 그 다음 실제 데이터를 조회
-    const { data, error } = await query.range(from, to).select("*");
+    // 데이터와 총 개수를 함께 조회
+    const { data, error, count } = await query.range(from, to);
 
     if (error) {
       console.error("카테고리별 업체 목록 조회 오류:", error);
