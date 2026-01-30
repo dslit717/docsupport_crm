@@ -113,17 +113,16 @@ export async function PUT(
 
     // 연락처 정보 업데이트
     if (body.contacts !== undefined && Array.isArray(body.contacts)) {
-      // 기존 연락처 매핑 조회
+      // 기존 연락처 매핑 조회 및 삭제
       const { data: existingContactMappings } = await supabase
         .from("beauty_product_contacts_map_uuid")
         .select("contact_id")
         .eq("product_id", id);
 
-      // 기존 연락처 삭제
       if (existingContactMappings && existingContactMappings.length > 0) {
         const contactIds = existingContactMappings.map((m) => m.contact_id);
-
-        // 연락처 매핑 삭제
+        
+        // 매핑 삭제
         await supabase
           .from("beauty_product_contacts_map_uuid")
           .delete()
@@ -136,11 +135,13 @@ export async function PUT(
           .in("id", contactIds);
       }
 
-      // 새 연락처 추가
+      // 새 연락처 추가 (id가 있으면 기존 것 업데이트, 없으면 새로 생성)
       for (const contact of body.contacts) {
         if (contact.company_name_ko) {
-          // 기존 연락처가 있으면 업데이트, 없으면 생성
+          let contactId: string;
+
           if (contact.id) {
+            // 기존 연락처 업데이트
             await supabase
               .from("beauty_product_contacts")
               .update({
@@ -151,23 +152,7 @@ export async function PUT(
                 person_in_charge: contact.person_in_charge || null,
               })
               .eq("id", contact.id);
-
-            // 매핑이 없으면 추가
-            const { data: existingMapping } = await supabase
-              .from("beauty_product_contacts_map_uuid")
-              .select("id")
-              .eq("product_id", id)
-              .eq("contact_id", contact.id)
-              .single();
-
-            if (!existingMapping) {
-              await supabase.from("beauty_product_contacts_map_uuid").insert([
-                {
-                  product_id: id,
-                  contact_id: contact.id,
-                },
-              ]);
-            }
+            contactId = contact.id;
           } else {
             // 새 연락처 생성
             const { data: newContact } = await supabase
@@ -183,16 +168,18 @@ export async function PUT(
               ])
               .select()
               .single();
-
-            if (newContact) {
-              await supabase.from("beauty_product_contacts_map_uuid").insert([
-                {
-                  product_id: id,
-                  contact_id: newContact.id,
-                },
-              ]);
-            }
+            
+            if (!newContact) continue;
+            contactId = newContact.id;
           }
+
+          // 매핑 추가
+          await supabase.from("beauty_product_contacts_map_uuid").insert([
+            {
+              product_id: id,
+              contact_id: contactId,
+            },
+          ]);
         }
       }
     }
