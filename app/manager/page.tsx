@@ -15,6 +15,7 @@ import {
   MapPin,
   Phone,
   Users,
+  Shield,
 } from "lucide-react";
 
 export default function ManagerDashboard() {
@@ -88,6 +89,13 @@ export default function ManagerDashboard() {
       href: "/manager/contact-products",
       icon: Users,
       color: "bg-emerald-500",
+    },
+    {
+      title: "로그인 접속 로그",
+      description: "일반 사용자(클라이언트)의 로그인 기록을 확인합니다",
+      href: "/manager/login-logs",
+      icon: Shield,
+      color: "bg-red-500",
     },
   ];
 

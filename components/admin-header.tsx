@@ -51,6 +51,7 @@ export default function AdminHeader({ currentPath }: AdminHeaderProps) {
     { href: "/manager/vendors", label: "업체 관리" },
     { href: "/manager/vendor-categories", label: "업체 카테고리 관리" },
     { href: "/manager/advertisement-logs", label: "광고 로그" },
+    { href: "/manager/login-logs", label: "로그인 로그" },
     { href: "/manager/beauty-products", label: "제품 관리" },
     { href: "/manager/beauty-products/images", label: "제품 이미지" },
     { href: "/manager/beauty-product-categories", label: "카테고리 관리" },
