@@ -140,7 +140,7 @@ export default function EditBlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <AdminHeader currentPath="/manager/blog" />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">

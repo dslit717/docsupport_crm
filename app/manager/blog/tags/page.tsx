@@ -147,7 +147,7 @@ export default function BlogTagsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <AdminHeader currentPath="/manager/blog/tags" />
 
       <div className="container mx-auto px-4 py-8">
