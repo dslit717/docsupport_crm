@@ -16,16 +16,40 @@ import {
   Phone,
   Users,
   Shield,
+  BookOpen,
+  UserCog,
+  Layers,
 } from "lucide-react";
 
 export default function ManagerDashboard() {
   const quickLinks = [
+    {
+      title: "유저 관리",
+      description: "관리자 및 사용자 계정을 관리합니다",
+      href: "/manager/users",
+      icon: UserCog,
+      color: "bg-slate-600",
+    },
     {
       title: "업체 관리",
       description: "업체 정보를 관리하고 광고 상태를 설정합니다",
       href: "/manager/vendors",
       icon: Building2,
       color: "bg-blue-500",
+    },
+    {
+      title: "업체 카테고리 관리",
+      description: "업체 분류 카테고리를 관리합니다",
+      href: "/manager/vendor-categories",
+      icon: Layers,
+      color: "bg-sky-500",
+    },
+    {
+      title: "블로그 관리",
+      description: "의학 전문 블로그 글을 작성하고 관리합니다",
+      href: "/manager/blog",
+      icon: BookOpen,
+      color: "bg-amber-500",
     },
     {
       title: "제품 관리",
