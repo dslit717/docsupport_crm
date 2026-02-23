@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status"); // published, draft, all
+    const status = searchParams.get("status");
     const tag = searchParams.get("tag");
-    const q = searchParams.get("q")?.trim(); // 조회(검색) 키워드
+    const q = searchParams.get("q")?.trim();
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const offset = (page - 1) * limit;
@@ -34,17 +34,12 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
-    // 상태 필터
     if (status && status !== "all") {
       query = query.eq("status", status);
     }
-
-    // 조회(검색): 제목 또는 내용에 키워드 포함
     if (q) {
       query = query.or(`title.ilike.%${q}%,content.ilike.%${q}%`);
     }
-
-    // 태그 필터
     if (tag) {
       query = query.contains("blog_post_tags.tag_id", [tag]);
     }
@@ -56,7 +51,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "블로그 글 조회 실패" }, { status: 500 });
     }
 
-    // 태그 데이터 변환
     const formattedPosts = (data || []).map((post: any) => ({
       ...post,
       tags: post.tags?.map((pt: any) => pt.tag).filter(Boolean) || [],
@@ -114,7 +108,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "블로그 글 생성 실패" }, { status: 500 });
     }
 
-    // 태그 연결
     if (tagIds && tagIds.length > 0) {
       const tagRelations = tagIds.map((tagId: string) => ({
         post_id: post.id,
@@ -130,37 +123,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // published 상태이고 태그가 있으면 사용자 페이지(docsupport) 구독 알림 API 호출
-    const docsupportUrl = process.env.DOCSUPPORT_SITE_URL || "https://docsupport.vercel.app";
-    const blogAdminKey = process.env.BLOG_ADMIN_API_KEY;
-    if (
-      status === "published" &&
-      tagIds?.length > 0 &&
-      blogAdminKey
-    ) {
-      try {
-        const notifyRes = await fetch(`${docsupportUrl}/api/blog/notify-subscribers`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-key": blogAdminKey,
-          },
-          body: JSON.stringify({ post_id: post.id }),
-        });
-        if (!notifyRes.ok) {
-          const errData = await notifyRes.json().catch(() => ({}));
-          console.error("구독 알림 API 호출 실패:", notifyRes.status, errData);
-        }
-      } catch (err) {
-        console.error("구독 알림 API 호출 중 오류:", err);
-      }
-    }
-
     return NextResponse.json({ success: true, post });
   } catch (error) {
     console.error("블로그 글 생성 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
-
 
