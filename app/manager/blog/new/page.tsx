@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Save } from "lucide-react";
 
 interface BlogTag {
   id: string;
@@ -61,7 +60,13 @@ export default function NewBlogPostPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("블로그 글이 저장되었습니다.");
+        let msg = "블로그 글이 저장되었습니다.";
+        const n = data.notify;
+        if (n?.reason) msg += "\n알림: " + n.reason;
+        else if (n?.called && n?.sentCount !== undefined)
+          msg += n.sentCount > 0 ? "\n알림: " + n.sentCount + "명 발송됨." : "\n알림: 발송 대상 없음.";
+        else if (n?.error) msg += "\n알림: " + n.error;
+        alert(msg);
         router.push("/manager/blog");
       } else {
         alert("저장 실패: " + data.error);
@@ -166,4 +171,3 @@ export default function NewBlogPostPage() {
     </div>
   );
 }
-

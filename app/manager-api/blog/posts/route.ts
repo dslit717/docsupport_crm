@@ -123,10 +123,41 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, post });
+    const docsupportUrl = process.env.DOCSUPPORT_SITE_URL || "https://docsupport.vercel.app";
+    const blogAdminKey = process.env.BLOG_ADMIN_API_KEY;
+    let notify: { called: boolean; ok?: boolean; status?: number; subscriberCount?: number; sentCount?: number; reason?: string; error?: string } = { called: false };
+
+    if (status === "published" && tagIds?.length > 0) {
+      if (!blogAdminKey) {
+        notify = { called: false, reason: "BLOG_ADMIN_API_KEY 미설정. CRM .env 또는 Vercel(CRM 프로젝트) 환경 변수에 추가하세요." };
+      } else {
+        try {
+          const res = await fetch(`${docsupportUrl}/api/blog/notify-subscribers`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-admin-key": blogAdminKey },
+            body: JSON.stringify({ post_id: post.id }),
+          });
+          const data = await res.json().catch(() => ({}));
+          notify = {
+            called: true,
+            ok: res.ok,
+            status: res.status,
+            subscriberCount: data.subscriberCount,
+            sentCount: data.sentCount,
+            reason: data.reason ?? data.message,
+            error: data.error,
+          };
+          if (!res.ok) console.error("알림 API 실패:", res.status, data);
+        } catch (err) {
+          notify = { called: true, ok: false, error: err instanceof Error ? err.message : "네트워크 오류" };
+          console.error("알림 API 호출 오류:", err);
+        }
+      }
+    }
+
+    return NextResponse.json({ success: true, post, notify });
   } catch (error) {
     console.error("블로그 글 생성 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
-
