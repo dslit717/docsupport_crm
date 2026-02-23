@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { openai } from "@/lib/server/openai-api";
+import { getOpenAI } from "@/lib/server/openai-api";
 
 // POST: 업체 설명을 벡터로 변환하여 저장
 export async function POST(
@@ -22,7 +22,7 @@ export async function POST(
     }
 
     // OpenAI를 사용하여 텍스트를 벡터로 변환
-    const embedding = await openai.embeddings.create({
+    const embedding = await getOpenAI().embeddings.create({
       model: "text-embedding-3-small",
       input: description_md,
     });

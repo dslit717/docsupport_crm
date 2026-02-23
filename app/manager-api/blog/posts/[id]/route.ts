@@ -129,13 +129,9 @@ export async function DELETE(
 
     const supabase = createSupabaseAdminClient();
 
-    // 태그 관계 먼저 삭제
+    // 관련 데이터 먼저 삭제 (테이블이 없어도 글 삭제는 진행)
     await supabase.from("blog_post_tags").delete().eq("post_id", resolvedParams.id);
-
-    // 댓글 삭제
     await supabase.from("blog_comments").delete().eq("post_id", resolvedParams.id);
-
-    // 좋아요 삭제
     await supabase.from("blog_likes").delete().eq("post_id", resolvedParams.id);
 
     // 블로그 글 삭제
@@ -146,7 +142,10 @@ export async function DELETE(
 
     if (error) {
       console.error("블로그 글 삭제 실패:", error);
-      return NextResponse.json({ error: "블로그 글 삭제 실패" }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message || "블로그 글 삭제 실패" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });

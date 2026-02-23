@@ -42,10 +42,12 @@ export function createOpenAIClient(config?: OpenAIConfig): OpenAI {
   });
 }
 
-/**
- * 기본 OpenAI 클라이언트 인스턴스
- */
-export const openai = createOpenAIClient();
+/** 빌드 시 모듈 로드만 해도 에러가 나지 않도록, 요청 시점에만 클라이언트 생성 */
+let _openai: OpenAI | null = null;
+export function getOpenAI(): OpenAI {
+  if (!_openai) _openai = createOpenAIClient();
+  return _openai;
+}
 
 /**
  * 텍스트 임베딩 생성
@@ -54,7 +56,7 @@ export async function createEmbedding(
   input: string,
   model: string = "text-embedding-3-small"
 ): Promise<number[]> {
-  const response = await openai.embeddings.create({
+  const response = await getOpenAI().embeddings.create({
     model,
     input,
   });
@@ -86,7 +88,7 @@ export async function extractKeywordsFromTitle(
 
   console.log(`키워드 추출 시작: ${postTitle}`);
 
-  const openai = createOpenAIClient();
+  const openai = getOpenAI();
 
   // ChatGPT를 사용하여 키워드 추출
   const completion = await openai.chat.completions.create({
@@ -157,7 +159,7 @@ export async function createChatCompletion(
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
   options: ChatCompletionOptions = {}
 ): Promise<string> {
-  const openai = createOpenAIClient();
+  const openai = getOpenAI();
 
   const completion = await openai.chat.completions.create({
     model: options.model || "gpt-4-turbo",

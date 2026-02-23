@@ -66,20 +66,28 @@ export default function BlogManagementPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("정말로 이 블로그 글을 삭제하시겠습니까?")) return;
 
+    const previousPosts = [...posts];
+    setPosts((prev) => prev.filter((p) => p.id !== id));
+
     try {
       const response = await fetch(`/manager-api/blog/posts/${id}`, {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        alert("블로그 글이 삭제되었습니다.");
-        loadPosts();
-      } else {
+      if (response.ok) return;
+
+      setPosts(previousPosts);
+      let errorMessage = "삭제 실패";
+      try {
         const data = await response.json();
-        alert("삭제 실패: " + data.error);
+        if (data?.error) errorMessage = data.error;
+      } catch (_) {
+        errorMessage = `삭제 실패 (${response.status})`;
       }
+      alert(errorMessage);
     } catch (error) {
       console.error("블로그 글 삭제 중 오류:", error);
+      setPosts(previousPosts);
       alert("삭제 중 오류가 발생했습니다.");
     }
   };
