@@ -24,6 +24,13 @@ import {
 export default function ManagerDashboard() {
   const quickLinks = [
     {
+      title: "블로그 관리",
+      description: "의학 전문 블로그 글을 작성하고 관리합니다",
+      href: "/manager/blog",
+      icon: BookOpen,
+      color: "bg-amber-500",
+    },
+    {
       title: "유저 관리",
       description: "관리자 및 사용자 계정을 관리합니다",
       href: "/manager/users",
@@ -43,13 +50,6 @@ export default function ManagerDashboard() {
       href: "/manager/vendor-categories",
       icon: Layers,
       color: "bg-sky-500",
-    },
-    {
-      title: "블로그 관리",
-      description: "의학 전문 블로그 글을 작성하고 관리합니다",
-      href: "/manager/blog",
-      icon: BookOpen,
-      color: "bg-amber-500",
     },
     {
       title: "제품 관리",

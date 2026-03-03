@@ -15,10 +15,47 @@ interface BlogTag {
   name: string;
 }
 
+/** content는 DB jsonb. 문자열 또는 블로그용 객체(abstract, post_introduction, posting_bodies 등)에서 미리보기 추출 */
+function getContentPreview(
+  content: string | Record<string, unknown> | null | undefined,
+  maxLen: number = 150
+): string {
+  if (content == null) return "(내용 없음)";
+  if (typeof content === "string") return content.length > maxLen ? content.substring(0, maxLen) + "..." : content;
+  if (typeof content !== "object") return "(내용 없음)";
+
+  const obj = content as Record<string, unknown>;
+
+  // 블로그 데이터 테이블 형식: abstract, post_introduction, introduction, posting_bodies, post_conclusion 등
+  const part =
+    (typeof obj.abstract === "string" && obj.abstract) ||
+    (typeof obj.post_introduction === "string" && obj.post_introduction) ||
+    (typeof obj.introduction === "string" && obj.introduction) ||
+    (typeof obj.post_conclusion === "string" && obj.post_conclusion) ||
+    (typeof obj.post_application === "string" && obj.post_application);
+  if (part) return part.length > maxLen ? part.substring(0, maxLen) + "..." : part;
+
+  // posting_bodies: [{ title, content }, ...]
+  if (Array.isArray(obj.posting_bodies) && obj.posting_bodies.length > 0) {
+    const first = obj.posting_bodies[0] as { content?: string; title?: string };
+    const text = typeof first.content === "string" ? first.content : (typeof first.title === "string" ? first.title : "");
+    if (text) return text.length > maxLen ? text.substring(0, maxLen) + "..." : text;
+  }
+
+  // TipTap/ProseMirror 형식: content: [{ text: "..." }]
+  const doc = obj as { content?: { text?: string }[] };
+  if (Array.isArray(doc.content)) {
+    const text = doc.content.map((n) => n?.text ?? "").join("");
+    if (text) return text.length > maxLen ? text.substring(0, maxLen) + "..." : text;
+  }
+
+  return "(내용 없음)";
+}
+
 interface BlogPost {
   id: string;
   title: string;
-  content: string;
+  content: string | Record<string, unknown>;
   author_id: string;
   author_name?: string;
   status: "draft" | "published" | "archived";
@@ -198,7 +235,7 @@ export default function BlogManagementPage() {
                     )}
 
                     <p className="text-gray-600 mb-4 line-clamp-2">
-                      {post.content.substring(0, 150)}...
+                      {getContentPreview(post.content, 150)}
                     </p>
 
                     <div className="flex items-center gap-6 text-sm text-gray-500">

@@ -92,11 +92,8 @@ export default function NewBlogPostPage() {
       <AdminHeader currentPath="/manager/blog" />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">새 블로그 글 작성</h1>
-          <p className="text-gray-600">
-            제목과 내용을 입력한 뒤 저장하세요.
-          </p>
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold mb-2">새 블로그 글 작성</h1>
         </div>
 
         {/* 블로그 글 작성 폼 */}

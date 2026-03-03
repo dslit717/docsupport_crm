@@ -13,10 +13,10 @@ interface AdminHeaderProps {
 
 const navItems = [
   { href: "/manager", label: "대시보드" },
+  { href: "/manager/blog", label: "블로그 관리" },
   { href: "/manager/users", label: "유저 관리" },
   { href: "/manager/vendors", label: "업체 관리" },
   { href: "/manager/vendor-categories", label: "업체 카테고리 관리" },
-  { href: "/manager/blog", label: "블로그 관리" },
   { href: "/manager/beauty-products", label: "제품 관리" },
   { href: "/manager/beauty-products/images", label: "제품 이미지" },
   { href: "/manager/beauty-product-categories", label: "카테고리 관리" },
