@@ -162,7 +162,7 @@ export default function ProfilePhotoPresetsPage() {
   };
 
   const loadDefaults = () => {
-    if (confirm("의사 프로필용 기본 프리셋(여성/남성 각 3종)으로 덮어쓸까요?")) {
+    if (confirm("기본값으로 리셋할까요?")) {
       setPresets(JSON.parse(JSON.stringify(DEFAULT_PRESETS)));
     }
   };
@@ -212,7 +212,7 @@ export default function ProfilePhotoPresetsPage() {
           </div>
           <div className="flex gap-2">
             <Button type="button" variant="outline" size="sm" onClick={loadDefaults}>
-              기본값 불러오기
+              기본값으로 리셋
             </Button>
             <Button type="button" size="sm" onClick={handleSave} disabled={saving}>
               {saving ? "저장 중..." : "저장"}
