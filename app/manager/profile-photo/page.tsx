@@ -161,9 +161,28 @@ export default function ProfilePhotoPresetsPage() {
     }
   };
 
-  const loadDefaults = () => {
-    if (confirm("기본값으로 리셋할까요?")) {
-      setPresets(JSON.parse(JSON.stringify(DEFAULT_PRESETS)));
+  /** 기본값으로 리셋 후 바로 저장 */
+  const loadDefaults = async () => {
+    if (!confirm("기본값으로 리셋할까요?")) return;
+    const payload = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+    try {
+      setSaving(true);
+      const res = await fetch("/manager-api/profile-photo/presets", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPresets(payload);
+        alert("기본값으로 리셋했습니다.");
+      } else {
+        alert(data?.error || "저장에 실패했습니다.");
+      }
+    } catch {
+      alert("저장 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
     }
   };
 
