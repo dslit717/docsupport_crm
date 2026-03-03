@@ -1,7 +1,7 @@
 "use client";
 
 import AdminHeader from "@/components/admin-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -19,6 +19,7 @@ import {
   BookOpen,
   UserCog,
   Layers,
+  Sparkles,
 } from "lucide-react";
 
 export default function ManagerDashboard() {
@@ -29,6 +30,13 @@ export default function ManagerDashboard() {
       href: "/manager/blog",
       icon: BookOpen,
       color: "bg-amber-500",
+    },
+    {
+      title: "AI 프로필 관리",
+      description: "AI 프로필 사진 생성용 프롬프트 프리셋을 관리합니다",
+      href: "/manager/profile-photo",
+      icon: Sparkles,
+      color: "bg-violet-500",
     },
     {
       title: "유저 관리",

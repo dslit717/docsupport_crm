@@ -14,6 +14,7 @@ interface AdminHeaderProps {
 const navItems = [
   { href: "/manager", label: "대시보드" },
   { href: "/manager/blog", label: "블로그 관리" },
+  { href: "/manager/profile-photo", label: "AI 프로필 관리" },
   { href: "/manager/users", label: "유저 관리" },
   { href: "/manager/vendors", label: "업체 관리" },
   { href: "/manager/vendor-categories", label: "업체 카테고리 관리" },
