@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { checkAdminAuth } from "@/lib/server/auth-utils";
 
-export type PresetItem = { id: string; label: string; prompt: string; image_url?: string | null };
+export type PresetItem = { id: string; label: string; prompt: string; prompt_midjourney?: string | null; prompt_nano_banana?: string | null; image_url?: string | null };
 export type PresetsResponse = { female: PresetItem[]; male: PresetItem[] };
 
-const PRESET_COLS = "gender, preset_id, label, prompt, image_url, sort_order";
+const PRESET_COLS = "gender, preset_id, label, prompt, prompt_midjourney, prompt_nano_banana, image_url, sort_order";
 
 /** 프리셋 목록 조회 (관리자) */
 export async function GET() {
@@ -25,10 +25,12 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const mapRow = (r: { preset_id: string; label: string; prompt: string; image_url: string | null }) => ({
+    const mapRow = (r: { preset_id: string; label: string; prompt: string; prompt_midjourney?: string | null; prompt_nano_banana?: string | null; image_url: string | null }) => ({
       id: r.preset_id,
       label: r.label,
       prompt: r.prompt,
+      prompt_midjourney: r.prompt_midjourney ?? null,
+      prompt_nano_banana: r.prompt_nano_banana ?? null,
       image_url: r.image_url ?? null,
     });
     const female = (data || []).filter((r) => r.gender === "female").map(mapRow);
@@ -60,11 +62,14 @@ export async function PUT(request: NextRequest) {
     const supabase = createSupabaseAdminClient();
     const now = new Date().toISOString();
 
+    const toStr = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
     const rows: Array<{
       gender: string;
       preset_id: string;
       label: string;
       prompt: string;
+      prompt_midjourney: string | null;
+      prompt_nano_banana: string | null;
       image_url: string | null;
       sort_order: number;
       updated_at: string;
@@ -77,6 +82,8 @@ export async function PUT(request: NextRequest) {
           preset_id: p.id,
           label: p.label,
           prompt: p.prompt,
+          prompt_midjourney: toStr(p.prompt_midjourney),
+          prompt_nano_banana: toStr(p.prompt_nano_banana),
           image_url: typeof p.image_url === "string" ? p.image_url : null,
           sort_order: i,
           updated_at: now,
@@ -90,6 +97,8 @@ export async function PUT(request: NextRequest) {
           preset_id: p.id,
           label: p.label,
           prompt: p.prompt,
+          prompt_midjourney: toStr(p.prompt_midjourney),
+          prompt_nano_banana: toStr(p.prompt_nano_banana),
           image_url: typeof p.image_url === "string" ? p.image_url : null,
           sort_order: i,
           updated_at: now,
@@ -106,6 +115,8 @@ export async function PUT(request: NextRequest) {
             preset_id: row.preset_id,
             label: row.label,
             prompt: row.prompt,
+            prompt_midjourney: row.prompt_midjourney,
+            prompt_nano_banana: row.prompt_nano_banana,
             image_url: row.image_url,
             sort_order: row.sort_order,
             updated_at: row.updated_at,
