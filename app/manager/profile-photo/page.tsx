@@ -26,52 +26,52 @@ const PRESET_CONCEPTS: Record<string, string> = {
   modern: "깔끔하고 세련된 스타일. 흰색 배경, 차분하고 자신감 있는 표정.",
 };
 
-/** 의사 프로필 사진용 기본 프리셋 3종 (여성/남성).*/
+/** 의사 프로필 사진용 기본 프리셋 3종 (여성/남성). 옷/포즈/배경은 대표이미지가 담당. */
 const DEFAULT_PRESETS: PresetsResponse = {
   female: [
     {
       id: "professional",
       label: "프로페셔널",
-      prompt: "professional medical headshot of korean female doctor, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "professional medical headshot, korean female doctor, white lab coat, arms crossed, warm natural smile, natural skin texture, soft diffused studio lighting, light gray background, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical headshot, korean female doctor, white lab coat, arms crossed, warm natural smile, high quality flattering portrait, light gray background, soft studio lighting",
+      prompt: "professional medical portrait, warm natural smile, natural skin texture, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "professional medical portrait, warm natural smile, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "professional medical portrait, warm natural smile, natural skin texture, high quality flattering portrait, soft studio lighting",
     },
     {
       id: "friendly",
       label: "친근한",
-      prompt: "warm friendly medical headshot of korean female doctor, white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical headshot, korean female doctor, white lab coat, arms crossed, bright warm smile, natural skin texture, soft diffused warm lighting, light beige background, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical headshot, korean female doctor, white lab coat, arms crossed, bright warm smile, high quality flattering portrait, light beige background, soft warm studio lighting",
+      prompt: "warm friendly medical portrait, bright warm smile, natural skin texture, soft warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly medical portrait, bright warm smile, natural skin texture, soft diffused warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly medical portrait, bright warm smile, natural skin texture, high quality flattering portrait, soft warm lighting",
     },
     {
       id: "modern",
       label: "모던",
-      prompt: "modern clean medical headshot of korean female doctor, white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical headshot, korean female doctor, white lab coat, arms crossed, calm confident expression, natural skin texture, soft diffused studio lighting, white background, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical headshot, korean female doctor, white lab coat, arms crossed, calm confident expression, high quality flattering portrait, white background, soft studio lighting",
+      prompt: "modern clean medical portrait, calm confident expression, natural skin texture, crisp studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean medical portrait, calm confident expression, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean medical portrait, calm confident expression, natural skin texture, high quality flattering portrait, crisp studio lighting",
     },
   ],
   male: [
     {
       id: "professional",
       label: "프로페셔널",
-      prompt: "professional medical headshot of korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "professional medical headshot, korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, natural skin texture, soft diffused studio lighting, light gray background, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical headshot, korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, high quality flattering portrait, light gray background, soft studio lighting",
+      prompt: "professional medical portrait, natural confident smile, natural skin texture, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "professional medical portrait, natural confident smile, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "professional medical portrait, natural confident smile, natural skin texture, high quality flattering portrait, soft studio lighting",
     },
     {
       id: "friendly",
       label: "친근한",
-      prompt: "warm friendly medical headshot of korean male doctor, white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical headshot, korean male doctor, white lab coat over dress shirt, arms crossed, warm natural smile, natural skin texture, soft diffused warm lighting, light beige background, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical headshot, korean male doctor, white lab coat over dress shirt, arms crossed, warm natural smile, high quality flattering portrait, light beige background, soft warm studio lighting",
+      prompt: "warm friendly medical portrait, warm natural smile, natural skin texture, soft warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly medical portrait, warm natural smile, natural skin texture, soft diffused warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly medical portrait, warm natural smile, natural skin texture, high quality flattering portrait, soft warm lighting",
     },
     {
       id: "modern",
       label: "모던",
-      prompt: "modern clean medical headshot of korean male doctor, sleek white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical headshot, korean male doctor, sleek white lab coat, arms crossed, calm confident expression, natural skin texture, soft diffused studio lighting, white background, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical headshot, korean male doctor, sleek white lab coat, arms crossed, calm confident expression, high quality flattering portrait, white background, soft studio lighting",
+      prompt: "modern clean medical portrait, calm confident expression, natural skin texture, crisp studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean medical portrait, calm confident expression, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean medical portrait, calm confident expression, natural skin texture, high quality flattering portrait, crisp studio lighting",
     },
   ],
 };
