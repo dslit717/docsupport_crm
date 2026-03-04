@@ -9,20 +9,63 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { Camera, Loader2 } from "lucide-react";
 
-type PresetItem = { id: string; label: string; prompt: string; image_url?: string | null };
+type PresetItem = {
+  id: string;
+  label: string;
+  prompt: string;
+  prompt_midjourney?: string | null;
+  prompt_nano_banana?: string | null;
+  image_url?: string | null;
+};
 type PresetsResponse = { female: PresetItem[]; male: PresetItem[] };
 
-/** 의사 프로필 사진용 기본 프리셋 3종 (여성/남성) */
+/** 의사 프로필 사진용 기본 프리셋 3종 (여성/남성).*/
 const DEFAULT_PRESETS: PresetsResponse = {
   female: [
-    { id: "professional", label: "프로페셔널", prompt: "RAW photo, professional headshot of korean female doctor, white lab coat, arms crossed, warm natural smile, realistic skin texture with natural pores, light gray background, soft studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4" },
-    { id: "friendly", label: "친근한", prompt: "RAW photo, warm friendly headshot of korean female doctor, white lab coat, arms crossed, bright warm smile, realistic skin texture with natural pores, light beige background, soft warm lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4" },
-    { id: "modern", label: "모던", prompt: "RAW photo, modern clean headshot of korean female doctor, sleek white lab coat, arms crossed, calm confident expression, realistic skin texture with natural pores, white background, crisp studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4" },
+    {
+      id: "professional",
+      label: "프로페셔널",
+      prompt: "RAW photo, professional headshot of korean female doctor, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_midjourney: "professional headshot of korean female doctor, white lab coat, arms crossed, warm natural smile, natural skin texture with minimal retouching, soft natural lighting, authentic portrait, light gray background, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "professional headshot of korean female doctor, white lab coat, arms crossed, warm natural smile, soft polished retouching but natural look not hyper-realistic, light gray background, soft studio lighting",
+    },
+    {
+      id: "friendly",
+      label: "친근한",
+      prompt: "RAW photo, warm friendly headshot of korean female doctor, white lab coat, arms crossed, bright warm smile, light beige background, soft warm lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly headshot of korean female doctor, white lab coat, arms crossed, bright warm smile, natural skin texture minimal retouching, soft warm lighting, authentic portrait, light beige background --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly headshot of korean female doctor, white lab coat, arms crossed, bright warm smile, soft polished natural look not hyper-realistic, light beige background, soft warm lighting",
+    },
+    {
+      id: "modern",
+      label: "모던",
+      prompt: "RAW photo, modern clean headshot of korean female doctor, sleek white lab coat, arms crossed, calm confident expression, white background, crisp studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean headshot of korean female doctor, sleek white lab coat, arms crossed, calm confident expression, natural skin texture minimal retouching, crisp studio lighting, authentic portrait, white background --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean headshot of korean female doctor, sleek white lab coat, arms crossed, calm confident expression, soft polished natural look not hyper-realistic, white background, crisp studio lighting",
+    },
   ],
   male: [
-    { id: "professional", label: "프로페셔널", prompt: "RAW photo, professional headshot of korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, realistic skin texture with natural pores, light gray background, soft studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4" },
-    { id: "friendly", label: "친근한", prompt: "RAW photo, warm friendly headshot of korean male doctor, white lab coat over dress shirt, arms crossed, bright warm smile, realistic skin texture with natural pores, light beige background, soft warm lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4" },
-    { id: "modern", label: "모던", prompt: "RAW photo, modern clean headshot of korean male doctor, sleek white lab coat, arms crossed, calm confident expression, realistic skin texture with natural pores, white background, crisp studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4" },
+    {
+      id: "professional",
+      label: "프로페셔널",
+      prompt: "RAW photo, professional headshot of korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_midjourney: "professional headshot of korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, natural skin texture minimal retouching, soft natural lighting, authentic portrait, light gray background --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "professional headshot of korean male doctor, white lab coat over dress shirt, arms crossed, natural confident smile, soft polished retouching but natural look not hyper-realistic, light gray background, soft studio lighting",
+    },
+    {
+      id: "friendly",
+      label: "친근한",
+      prompt: "RAW photo, warm friendly headshot of korean male doctor, white lab coat over dress shirt, arms crossed, bright warm smile, light beige background, soft warm lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly headshot of korean male doctor, white lab coat over dress shirt, arms crossed, bright warm smile, natural skin texture minimal retouching, soft warm lighting, authentic portrait, light beige background --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly headshot of korean male doctor, white lab coat over dress shirt, arms crossed, bright warm smile, soft polished natural look not hyper-realistic, light beige background, soft warm lighting",
+    },
+    {
+      id: "modern",
+      label: "모던",
+      prompt: "RAW photo, modern clean headshot of korean male doctor, sleek white lab coat, arms crossed, calm confident expression, white background, crisp studio lighting, 85mm --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean headshot of korean male doctor, sleek white lab coat, arms crossed, calm confident expression, natural skin texture minimal retouching, crisp studio lighting, authentic portrait, white background --style raw --s 20 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean headshot of korean male doctor, sleek white lab coat, arms crossed, calm confident expression, soft polished natural look not hyper-realistic, white background, crisp studio lighting",
+    },
   ],
 };
 
@@ -33,6 +76,7 @@ function PresetBlock({
   fileInputRefs,
   onUpload,
   onUpdatePrompt,
+  onUpdatePromptField,
 }: {
   gender: "female" | "male";
   presets: PresetItem[];
@@ -40,6 +84,7 @@ function PresetBlock({
   fileInputRefs: React.RefObject<Record<string, HTMLInputElement | null>>;
   onUpload: (gender: "female" | "male", index: number, file: File) => void;
   onUpdatePrompt: (gender: "female" | "male", index: number, value: string) => void;
+  onUpdatePromptField: (gender: "female" | "male", index: number, field: "prompt_midjourney" | "prompt_nano_banana", value: string) => void;
 }) {
   const title = gender === "female" ? "여성 프리셋" : "남성 프리셋";
   const emptyMsg = gender === "female" ? "등록된 여성 프리셋이 없습니다." : "등록된 남성 프리셋이 없습니다.";
@@ -76,14 +121,36 @@ function PresetBlock({
               </div>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-gray-500">프롬프트</Label>
+              <Label className="text-xs text-gray-500">공통 프롬프트 (모델별 비우면 이걸 사용)</Label>
               <Textarea
                 value={preset.prompt}
                 onChange={(e) => onUpdatePrompt(gender, index, e.target.value)}
                 placeholder="RAW photo, ..."
-                rows={3}
+                rows={2}
                 className="w-full resize-y text-sm font-mono"
               />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-gray-500">미드저니용</Label>
+                <Textarea
+                  value={preset.prompt_midjourney ?? ""}
+                  onChange={(e) => onUpdatePromptField(gender, index, "prompt_midjourney", e.target.value)}
+                  placeholder="natural skin, minimal retouching..."
+                  rows={2}
+                  className="w-full resize-y text-sm font-mono"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-gray-500">나노바나나용</Label>
+                <Textarea
+                  value={preset.prompt_nano_banana ?? ""}
+                  onChange={(e) => onUpdatePromptField(gender, index, "prompt_nano_banana", e.target.value)}
+                  placeholder="soft polished, natural look..."
+                  rows={2}
+                  className="w-full resize-y text-sm font-mono"
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -95,20 +162,33 @@ function PresetBlock({
   );
 }
 
+const MODEL_OPTIONS = [
+  { id: "midjourney", label: "Midjourney" },
+  { id: "nano_banana", label: "Nano Banana" },
+] as const;
+
 export default function ProfilePhotoPresetsPage() {
   const [presets, setPresets] = useState<PresetsResponse>({ female: [], male: [] });
+  const [selectedModels, setSelectedModels] = useState<string[]>(["midjourney", "nano_banana"]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const loadPresets = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/manager-api/profile-photo/presets");
-      const data = await res.json();
-      if (res.ok && data?.female && data?.male) {
-        setPresets({ female: data.female, male: data.male });
+      const [presetsRes, configRes] = await Promise.all([
+        fetch("/manager-api/profile-photo/presets"),
+        fetch("/manager-api/profile-photo/config"),
+      ]);
+      const presetsData = await presetsRes.json();
+      const configData = await configRes.json();
+      if (presetsRes.ok && presetsData?.female && presetsData?.male) {
+        setPresets({ female: presetsData.female, male: presetsData.male });
       } else {
         setPresets({ female: [], male: [] });
+      }
+      if (configRes.ok && Array.isArray(configData?.selected_models)) {
+        setSelectedModels(configData.selected_models);
       }
     } catch {
       setPresets({ female: [], male: [] });
@@ -120,6 +200,13 @@ export default function ProfilePhotoPresetsPage() {
   useEffect(() => {
     loadPresets();
   }, []);
+
+  const toggleModel = (id: string) => {
+    setSelectedModels((prev) => {
+      const next = prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id];
+      return next.length >= 1 ? next : prev;
+    });
+  };
 
   const updatePreset = (gender: "female" | "male", index: number, field: keyof PresetItem, value: string | null) => {
     setPresets((prev) => {
@@ -195,11 +282,21 @@ export default function ProfilePhotoPresetsPage() {
         body: JSON.stringify(presets),
       });
       const data = await res.json();
-      if (res.ok) {
-        alert("저장되었습니다.");
-      } else {
+      if (!res.ok) {
         alert(data?.error || "저장에 실패했습니다.");
+        return;
       }
+      const configRes = await fetch("/manager-api/profile-photo/config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selected_models: selectedModels }),
+      });
+      if (!configRes.ok) {
+        const configData = await configRes.json();
+        alert("프리셋은 저장되었으나 모델 설정 저장 실패: " + (configData?.error ?? ""));
+        return;
+      }
+      alert("저장되었습니다. 선택한 모델이 사용자 페이지에 적용됩니다.");
     } catch {
       alert("저장 중 오류가 발생했습니다.");
     } finally {
@@ -240,6 +337,24 @@ export default function ProfilePhotoPresetsPage() {
         </div>
 
         <div className="space-y-8">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-2">사용 모델</h2>
+            <p className="text-sm text-gray-500 mb-4">선택한 모델이 사용자 페이지 AI 프로필 생성에 적용됩니다. 둘 다 선택하면 두 장 생성됩니다.</p>
+            <div className="flex flex-wrap gap-4">
+              {MODEL_OPTIONS.map((opt) => (
+                <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedModels.includes(opt.id)}
+                    onChange={() => toggleModel(opt.id)}
+                    className="rounded border-gray-300"
+                  />
+                  <span className="text-sm font-medium">{opt.label}</span>
+                </label>
+              ))}
+            </div>
+          </Card>
+
           <PresetBlock
             gender="female"
             presets={presets.female}
@@ -247,6 +362,7 @@ export default function ProfilePhotoPresetsPage() {
             fileInputRefs={fileInputRefs}
             onUpload={handleImageUpload}
             onUpdatePrompt={(g, i, v) => updatePreset(g, i, "prompt", v)}
+            onUpdatePromptField={(g, i, field, v) => updatePreset(g, i, field, v)}
           />
           <PresetBlock
             gender="male"
@@ -255,6 +371,7 @@ export default function ProfilePhotoPresetsPage() {
             fileInputRefs={fileInputRefs}
             onUpload={handleImageUpload}
             onUpdatePrompt={(g, i, v) => updatePreset(g, i, "prompt", v)}
+            onUpdatePromptField={(g, i, field, v) => updatePreset(g, i, field, v)}
           />
         </div>
       </div>
