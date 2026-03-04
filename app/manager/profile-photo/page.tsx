@@ -26,55 +26,6 @@ const PRESET_CONCEPTS: Record<string, string> = {
   modern: "깔끔하고 세련된 스타일. 흰색 배경, 차분하고 자신감 있는 표정.",
 };
 
-/** 의사 프로필 사진용 기본 프리셋 3종 (여성/남성). 옷/포즈/배경은 대표이미지가 담당. */
-const DEFAULT_PRESETS: PresetsResponse = {
-  female: [
-    {
-      id: "professional",
-      label: "프로페셔널",
-      prompt: "professional medical portrait, warm natural smile, natural skin texture, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "professional medical portrait, warm natural smile, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical portrait, warm natural smile, natural skin texture, high quality flattering portrait, soft studio lighting",
-    },
-    {
-      id: "friendly",
-      label: "친근한",
-      prompt: "warm friendly medical portrait, bright warm smile, natural skin texture, soft warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical portrait, bright warm smile, natural skin texture, soft diffused warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical portrait, bright warm smile, natural skin texture, high quality flattering portrait, soft warm lighting",
-    },
-    {
-      id: "modern",
-      label: "모던",
-      prompt: "modern clean medical portrait, calm confident expression, natural skin texture, crisp studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical portrait, calm confident expression, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical portrait, calm confident expression, natural skin texture, high quality flattering portrait, crisp studio lighting",
-    },
-  ],
-  male: [
-    {
-      id: "professional",
-      label: "프로페셔널",
-      prompt: "professional medical portrait, natural confident smile, natural skin texture, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "professional medical portrait, natural confident smile, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical portrait, natural confident smile, natural skin texture, high quality flattering portrait, soft studio lighting",
-    },
-    {
-      id: "friendly",
-      label: "친근한",
-      prompt: "warm friendly medical portrait, warm natural smile, natural skin texture, soft warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical portrait, warm natural smile, natural skin texture, soft diffused warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical portrait, warm natural smile, natural skin texture, high quality flattering portrait, soft warm lighting",
-    },
-    {
-      id: "modern",
-      label: "모던",
-      prompt: "modern clean medical portrait, calm confident expression, natural skin texture, crisp studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical portrait, calm confident expression, natural skin texture, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical portrait, calm confident expression, natural skin texture, high quality flattering portrait, crisp studio lighting",
-    },
-  ],
-};
 
 function PresetBlock({
   gender,
@@ -153,11 +104,11 @@ function PresetBlock({
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-gray-500">나노바나나용</Label>
+                <Label className="text-xs text-gray-500">나노바나나용 (보정·미화 지시 포함 권장)</Label>
                 <Textarea
                   value={preset.prompt_nano_banana ?? ""}
                   onChange={(e) => onUpdatePromptField(gender, index, "prompt_nano_banana", e.target.value)}
-                  placeholder="soft polished, natural look..."
+                  placeholder="professional retouching, enhance and beautify, polished portrait..."
                   rows={2}
                   className="w-full resize-y text-sm font-mono"
                 />
@@ -259,29 +210,9 @@ export default function ProfilePhotoPresetsPage() {
     }
   };
 
-  /** 기본값으로 리셋 후 바로 저장 */
-  const loadDefaults = async () => {
-    if (!confirm("기본값으로 리셋할까요?")) return;
-    const payload = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
-    try {
-      setSaving(true);
-      const res = await fetch("/manager-api/profile-photo/presets", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setPresets(payload);
-        alert("기본값으로 리셋했습니다.");
-      } else {
-        alert(data?.error || "저장에 실패했습니다.");
-      }
-    } catch {
-      alert("저장 중 오류가 발생했습니다.");
-    } finally {
-      setSaving(false);
-    }
+  const discardChanges = async () => {
+    if (!confirm("수정한 내용을 취소하고 DB에서 다시 불러올까요?")) return;
+    await loadPresets();
   };
 
   const handleSave = async () => {
@@ -338,8 +269,8 @@ export default function ProfilePhotoPresetsPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={loadDefaults}>
-              기본값으로 리셋
+            <Button type="button" variant="outline" size="sm" onClick={discardChanges}>
+              변경사항 초기화
             </Button>
             <Button type="button" size="sm" onClick={handleSave} disabled={saving}>
               {saving ? "저장 중..." : "저장"}
@@ -349,8 +280,7 @@ export default function ProfilePhotoPresetsPage() {
 
         <div className="space-y-8">
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-2">사용 모델</h2>
-            <p className="text-sm text-gray-500 mb-4">선택한 모델이 사용자 페이지 AI 프로필 생성에 적용됩니다. 둘 다 선택하면 두 장 생성됩니다.</p>
+            <h2 className="text-lg font-semibold">사용 모델</h2>
             <div className="flex flex-wrap gap-4">
               {MODEL_OPTIONS.map((opt) => (
                 <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
