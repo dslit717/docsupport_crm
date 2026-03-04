@@ -32,46 +32,46 @@ const DEFAULT_PRESETS: PresetsResponse = {
     {
       id: "professional",
       label: "프로페셔널",
-      prompt: "professional medical headshot of korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "professional medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting"
+      prompt: "professional medical headshot of korean female doctor white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "professional medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor white lab coat, arms crossed, warm natural smile, light gray background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "professional medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting"
     },
     {
       id: "friendly",
       label: "친근한",
-      prompt: "warm friendly medical headshot of korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light beige background, soft diffused warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting"
+      prompt: "warm friendly medical headshot of korean female doctor white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor white lab coat, arms crossed, warm natural smile, light beige background, soft diffused warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting"
     },
     {
       id: "modern",
       label: "모던",
-      prompt: "modern clean medical headshot of korean female doctor without glasses, white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, calm confident expression, white background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, calm confident expression, white background, soft studio lighting"
+      prompt: "modern clean medical headshot of korean female doctor white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor white lab coat, arms crossed, calm confident expression, white background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor white lab coat, arms crossed, calm confident expression, white background, soft studio lighting"
     }
   ],
   male: [
     {
       id: "professional",
       label: "프로페셔널",
-      prompt: "professional medical headshot of korean male doctor without glasses, white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "professional medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean male doctor without glasses, white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean male doctor without glasses, white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft studio lighting"
+      prompt: "professional medical headshot of korean male doctor white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "professional medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean male doctor white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "professional medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean male doctor white lab coat over dress shirt, arms crossed, natural confident smile, light gray background, soft studio lighting"
     },
     {
       id: "friendly",
       label: "친근한",
-      prompt: "warm friendly medical headshot of korean male doctor without glasses, white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean male doctor without glasses, white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft diffused warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean male doctor without glasses, white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft warm studio lighting"
+      prompt: "warm friendly medical headshot of korean male doctor white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean male doctor white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft diffused warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean male doctor white lab coat over dress shirt, arms crossed, warm natural smile, light beige background, soft warm studio lighting"
     },
     {
       id: "modern",
       label: "모던",
-      prompt: "modern clean medical headshot of korean male doctor without glasses, sleek white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean male doctor without glasses, sleek white lab coat, arms crossed, calm confident expression, white background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean male doctor without glasses, sleek white lab coat, arms crossed, calm confident expression, white background, soft studio lighting"
+      prompt: "modern clean medical headshot of korean male doctor sleek white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean male doctor sleek white lab coat, arms crossed, calm confident expression, white background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean male doctor sleek white lab coat, arms crossed, calm confident expression, white background, soft studio lighting"
     }
   ],
 };
