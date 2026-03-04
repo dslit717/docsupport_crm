@@ -19,30 +19,37 @@ type PresetItem = {
 };
 type PresetsResponse = { female: PresetItem[]; male: PresetItem[] };
 
+/** 프리셋별 컨셉 설명 */
+const PRESET_CONCEPTS: Record<string, string> = {
+  professional: "진지하고 신뢰감 있는 스타일. 밝은 회색 배경, 부드러운 자연스러운 미소.",
+  friendly: "따뜻하고 친근한 분위기. 베이지 배경, 환한 미소로 접근성 강조.",
+  modern: "깔끔하고 세련된 스타일. 흰색 배경, 차분하고 자신감 있는 표정.",
+};
+
 /** 의사 프로필 사진용 기본 프리셋 3종 (여성/남성).*/
 const DEFAULT_PRESETS: PresetsResponse = {
   female: [
     {
       id: "professional",
       label: "프로페셔널",
-      prompt: "RAW photo, professional medical headshot of korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt: "professional medical headshot of korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
       prompt_midjourney: "professional medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "professional medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting",
+      prompt_nano_banana: "professional medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light gray background, soft studio lighting"
     },
     {
       id: "friendly",
       label: "친근한",
-      prompt: "RAW photo, warm friendly medical headshot of korean female doctor without glasses, white lab coat, arms crossed, bright warm smile, light beige background, soft warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "warm friendly medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, bright warm smile, light beige background, soft diffused warm lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "warm friendly medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, bright warm smile, light beige background, soft warm lighting",
+      prompt: "warm friendly medical headshot of korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "warm friendly medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light beige background, soft diffused warm studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "warm friendly medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, warm natural smile, light beige background, soft warm studio lighting"
     },
     {
       id: "modern",
       label: "모던",
-      prompt: "RAW photo, modern clean medical headshot of korean female doctor without glasses, sleek white lab coat, arms crossed, calm confident expression, white background, crisp studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_midjourney: "modern clean medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, sleek white lab coat, arms crossed, calm confident expression, white background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
-      prompt_nano_banana: "modern clean medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, sleek white lab coat, arms crossed, calm confident expression, white background, crisp studio lighting",
-    },
+      prompt: "modern clean medical headshot of korean female doctor without glasses, white lab coat, arms crossed, calm confident expression, white background, soft studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_midjourney: "modern clean medical headshot, preserve exact facial identity from reference image, no facial modification, natural skin texture visible, subtle professional retouch only, korean female doctor without glasses, white lab coat, arms crossed, calm confident expression, white background, soft diffused studio lighting, 85mm --style raw --s 10 --v 6.1 --ar 3:4",
+      prompt_nano_banana: "modern clean medical headshot, preserve exact facial identity from reference image, retain original skin texture, subtle skin cleanup only, minor blemish removal only, korean female doctor without glasses, white lab coat, arms crossed, calm confident expression, white background, soft studio lighting"
+    }
   ],
   male: [
     {
@@ -94,6 +101,10 @@ function PresetBlock({
       <div className="space-y-4">
         {presets.map((preset, index) => (
           <div key={preset.id} className="border rounded-lg p-4 space-y-2 bg-gray-50/50">
+            <div className="mb-3 pb-2 border-b border-gray-200">
+              <h3 className="font-semibold text-base">{preset.label}</h3>
+              <p className="text-sm text-gray-500 mt-0.5">{PRESET_CONCEPTS[preset.id] ?? ""}</p>
+            </div>
             <div className="flex gap-4 flex-wrap">
               <div className="space-y-1">
                 <Label className="text-xs text-gray-500">대표 이미지</Label>
