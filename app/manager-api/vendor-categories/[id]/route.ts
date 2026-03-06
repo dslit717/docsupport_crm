@@ -83,13 +83,8 @@ export async function PUT(
     const supabase = await createSupabaseAdminClient();
     const resolvedParams = params instanceof Promise ? await params : params;
     const { id } = resolvedParams;
-    
-    console.log("[카테고리 수정] params:", params);
-    console.log("[카테고리 수정] resolvedParams:", resolvedParams);
-    console.log("[카테고리 수정] id:", id);
-    
+
     if (!id || id === "undefined") {
-      console.error("[카테고리 수정] ID가 없습니다:", id);
       return NextResponse.json(
         { error: "카테고리 ID가 필요합니다." },
         { status: 400 }
@@ -135,13 +130,11 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error("카테고리 수정 오류:", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error("카테고리 수정 오류:", error);
     return NextResponse.json(
       { error: "서버 오류가 발생했습니다." },
       { status: 500 }

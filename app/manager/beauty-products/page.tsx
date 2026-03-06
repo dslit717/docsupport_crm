@@ -269,15 +269,11 @@ export default function BeautyProductsPage() {
             p.id === id ? { ...p, is_active: !currentStatus } : p
           )
         );
-        const result = await response.json();
-        // 선택적: 토스트 알림 등으로 피드백 제공
-        console.log(result.message);
       } else {
         const result = await response.json();
         alert(`상태 변경 실패: ${result.error}`);
       }
     } catch (error) {
-      console.error("상태 변경 오류:", error);
       alert("상태 변경 중 오류가 발생했습니다.");
     }
   };

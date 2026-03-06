@@ -63,15 +63,6 @@ export async function POST(request: NextRequest) {
     const message = createPartnerMessage(vendor.name, vendor.description_md || "", vendor.id);
     const toNumberClean = to_number.replace(/-/g, ""); // 하이픈 제거
 
-    console.log("[Solapi LMS 전송 시작]", {
-      vendor_id,
-      vendor_name: vendor.name,
-      to_number: toNumberClean,
-      from_number: FROM_NUMBER,
-      message_length: message.length,
-      detail_link: `https://docsupport.kr/partners/${vendor.id}`,
-    });
-
     // Solapi 직접 호출
     try {
       // Dynamic import for Solapi (서버 사이드에서만 실행)
@@ -88,13 +79,6 @@ export async function POST(request: NextRequest) {
         text: message,
       });
 
-      console.log("[Solapi LMS 전송 성공]", {
-        vendor_id,
-        vendor_name: vendor.name,
-        to_number: toNumberClean,
-        result,
-      });
-
       return createSuccessResponse({
         message: "파트너 문자가 성공적으로 전송되었습니다.",
         vendor_name: vendor.name,
@@ -102,8 +86,6 @@ export async function POST(request: NextRequest) {
         solapi_result: result,
       });
     } catch (solapiError: any) {
-      console.error("[Solapi LMS 전송 실패]", solapiError);
-
       // Solapi 에러 상세 정보 추출
       const errorInfo = {
         name: solapiError?.name,
@@ -125,7 +107,6 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error: any) {
-    console.error("[LMS 전송 오류]", error);
     return NextResponse.json(
       {
         success: false,

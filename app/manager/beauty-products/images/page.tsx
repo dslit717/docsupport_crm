@@ -103,11 +103,8 @@ export default function ProductImagesPage() {
         }));
         // 이미지 에러 상태 초기화
         setImageErrors({});
-      } else {
-        console.error("제품 목록 로드 실패:", result.error);
       }
-    } catch (error) {
-      console.error("제품 목록 로드 오류:", error);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -166,8 +163,6 @@ export default function ProductImagesPage() {
 
       const result = await response.json();
 
-      console.log("업로드 응답:", { status: response.status, result });
-
       if (response.ok) {
         setUploadSuccess(selectedProduct.id);
         // 이미지 타임스탬프 업데이트 (캐시 무효화)
@@ -186,14 +181,11 @@ export default function ProductImagesPage() {
         setIsUploadDialogOpen(false);
         resetUploadState();
       } else {
-        // 상세 에러 메시지 표시
         const errorMessage = result.error || result.message || "알 수 없는 오류";
         const errorDetails = result.details || "";
-        console.error("업로드 실패:", { status: response.status, result });
         alert(`업로드 실패 (${response.status})\n\n오류: ${errorMessage}${errorDetails ? `\n상세: ${errorDetails}` : ""}`);
       }
     } catch (error: any) {
-      console.error("업로드 오류:", error);
       alert(`이미지 업로드 중 오류가 발생했습니다.\n\n${error?.message || error}`);
     } finally {
       setUploading(null);

@@ -9,16 +9,13 @@ export async function GET(
 ) {
   try {
     const resolvedParams = await params;
-    console.log("GET /manager-api/blog/posts/[id] - params:", resolvedParams);
-    
+
     const authResult = await checkAdminAuth();
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
 
     const supabase = createSupabaseAdminClient();
-
-    console.log("Fetching blog post with ID:", resolvedParams.id);
 
     const { data, error } = await supabase
       .from("blog_posts")
@@ -33,10 +30,7 @@ export async function GET(
       .eq("id", resolvedParams.id)
       .single();
 
-    console.log("Blog post query result:", { data, error });
-
     if (error) {
-      console.error("블로그 글 조회 실패:", error);
       return NextResponse.json({ error: "블로그 글을 찾을 수 없습니다", details: error }, { status: 404 });
     }
 
@@ -48,7 +42,6 @@ export async function GET(
 
     return NextResponse.json({ post: formattedPost });
   } catch (error) {
-    console.error("블로그 글 조회 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
@@ -84,7 +77,6 @@ export async function PUT(
       .single();
 
     if (postError) {
-      console.error("블로그 글 수정 실패:", postError);
       return NextResponse.json({ error: "블로그 글 수정 실패" }, { status: 500 });
     }
 
@@ -103,13 +95,12 @@ export async function PUT(
         .insert(tagRelations);
 
       if (tagError) {
-        console.error("태그 연결 실패:", tagError);
+        // 태그 연결 실패 시 무시 (글 수정은 성공)
       }
     }
 
     return NextResponse.json({ success: true, post });
   } catch (error) {
-    console.error("블로그 글 수정 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
@@ -141,7 +132,6 @@ export async function DELETE(
       .eq("id", resolvedParams.id);
 
     if (error) {
-      console.error("블로그 글 삭제 실패:", error);
       return NextResponse.json(
         { error: error.message || "블로그 글 삭제 실패" },
         { status: 500 }
@@ -150,7 +140,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("블로그 글 삭제 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

@@ -61,8 +61,6 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    console.log("[업체 수정 요청]", { id, body });
-
     const {
       name,
       category_ids,
@@ -88,8 +86,6 @@ export async function PUT(
       updateData.slug = generateSlug(name);
     }
 
-    console.log("[업체 수정 데이터]", { id, updateData });
-
     // 업체 정보 업데이트
     const { data: vendor, error: vendorError } = await supabase
       .from("vendors")
@@ -99,7 +95,6 @@ export async function PUT(
       .single();
 
     if (vendorError) {
-      console.error("[업체 수정 오류]", vendorError);
       return NextResponse.json(
         {
           success: false,
@@ -127,16 +122,13 @@ export async function PUT(
           "vendor_id",
           "category_id"
         );
-      } catch (categoryError: any) {
-        console.error("[카테고리 연결 오류]", categoryError);
+      } catch {
         // 카테고리 연결 실패해도 업체 수정은 성공으로 처리
       }
     }
 
-    console.log("[업체 수정 성공]", { id, vendor_name: vendor.name });
     return createSuccessResponse(vendor);
   } catch (error: any) {
-    console.error("[업체 수정 예외]", error);
     return NextResponse.json(
       {
         success: false,

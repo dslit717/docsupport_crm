@@ -83,8 +83,6 @@ export async function POST(request: NextRequest) {
   try {
     // 환경 변수 확인
     const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
-    console.log("[이미지 업로드] Service Role Key 설정됨:", hasServiceKey);
-    
     if (!hasServiceKey) {
       return createErrorResponse(
         new Error("SUPABASE_SERVICE_ROLE_KEY 환경 변수가 설정되지 않았습니다."),
@@ -94,17 +92,10 @@ export async function POST(request: NextRequest) {
 
     // Admin 클라이언트 사용 (service_role 키로 RLS 우회)
     const supabase = createSupabaseAdminClient();
-    console.log("[이미지 업로드] Admin 클라이언트 생성 완료");
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const productId = formData.get("product_id") as string; // beauty_products.id (UUID)
-    
-    console.log("[이미지 업로드] 요청 데이터:", { 
-      fileName: file?.name, 
-      fileSize: file?.size, 
-      productId 
-    });
 
     // 유효성 검사
     if (!file) {
@@ -172,8 +163,6 @@ export async function POST(request: NextRequest) {
     };
     const contentType = contentTypeMap[fileExt] || "image/jpeg";
 
-    console.log("[이미지 업로드] Storage 업로드 시작:", { fileName, contentType });
-    
     // 이미지 업로드
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("product_imgs")
@@ -183,17 +172,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      console.error("Storage 업로드 오류:", {
-        message: uploadError.message,
-        name: uploadError.name,
-        cause: uploadError.cause,
-        stack: uploadError.stack,
-        fullError: JSON.stringify(uploadError),
-      });
       return createErrorResponse(uploadError, 400, "파일 업로드 오류");
     }
-    
-    console.log("[이미지 업로드] Storage 업로드 성공:", uploadData);
 
     // DB에 이미지 파일명 저장
     const { error: updateError } = await supabase
@@ -204,7 +184,6 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       // 업로드된 파일 롤백
       await supabase.storage.from("product_imgs").remove([fileName]);
-      console.error("DB 업데이트 오류:", updateError);
       return createErrorResponse(updateError, 500, "이미지 정보 저장 오류");
     }
 
@@ -221,7 +200,6 @@ export async function POST(request: NextRequest) {
       productId: productId,
     }, 201);
   } catch (error) {
-    console.error("이미지 업로드 오류:", error);
     return createErrorResponse(error, 500, "이미지 업로드 오류");
   }
 }

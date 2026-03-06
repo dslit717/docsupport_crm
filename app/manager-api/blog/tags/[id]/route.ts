@@ -36,15 +36,11 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error("태그 수정 실패:", error);
       return NextResponse.json({ error: "태그 수정 실패", details: error }, { status: 500 });
     }
 
-    console.log("태그 수정 성공:", data);
-
     return NextResponse.json({ success: true, tag: data });
   } catch (error) {
-    console.error("태그 수정 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
@@ -76,13 +72,11 @@ export async function DELETE(
       .eq("id", resolvedParams.id);
 
     if (error) {
-      console.error("태그 삭제 실패:", error);
       return NextResponse.json({ error: "태그 삭제 실패" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("태그 삭제 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

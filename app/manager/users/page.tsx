@@ -108,11 +108,8 @@ export default function UsersPage() {
           total: result.count || 0,
           totalPages: result.totalPages || Math.ceil((result.count || 0) / prev.limit),
         }));
-      } else {
-        console.error("유저 목록 로드 실패:", result.error);
       }
-    } catch (error) {
-      console.error("유저 목록 로드 오류:", error);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -132,16 +129,19 @@ export default function UsersPage() {
 
     setUpdating(true);
     try {
-      console.log("[의사 인증 변경] 요청:", { userId: selectedUser.id, verified });
-      
       const response = await fetch(`/manager-api/users/${selectedUser.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_doctor_verified: verified }),
       });
 
-      const result = await response.json();
-      console.log("[의사 인증 변경] 응답:", { status: response.status, result });
+      const text = await response.text();
+      let result: { error?: string; message?: string; details?: string };
+      try {
+        result = text.startsWith("{") ? JSON.parse(text) : { error: `서버가 HTML을 반환했습니다 (${response.status}). 로그인 상태를 확인하세요.` };
+      } catch {
+        result = { error: `응답 파싱 실패 (${response.status})` };
+      }
 
       if (response.ok) {
         // 로컬 상태 업데이트
@@ -155,11 +155,9 @@ export default function UsersPage() {
       } else {
         const errorMessage = result.error || result.message || "알 수 없는 오류";
         const errorDetails = result.details || "";
-        console.error("[의사 인증 변경] 오류:", { status: response.status, result });
         alert(`오류 (${response.status})\n\n${errorMessage}${errorDetails ? `\n상세: ${errorDetails}` : ""}`);
       }
     } catch (error: any) {
-      console.error("[의사 인증 변경] 예외:", error);
       alert(`의사 인증 상태 변경 중 오류가 발생했습니다.\n\n${error?.message || error}`);
     } finally {
       setUpdating(false);
@@ -184,7 +182,13 @@ export default function UsersPage() {
         body: JSON.stringify({ is_doctor_verified: newVerified }),
       });
 
-      const result = await response.json();
+      const text = await response.text();
+      let result: { error?: string; message?: string };
+      try {
+        result = text.startsWith("{") ? JSON.parse(text) : { error: `서버가 HTML을 반환했습니다 (${response.status}). 로그인 상태를 확인하세요.` };
+      } catch {
+        result = { error: `응답 파싱 실패 (${response.status})` };
+      }
 
       if (response.ok) {
         // 로컬 상태 업데이트
@@ -195,11 +199,9 @@ export default function UsersPage() {
         );
       } else {
         const errorMessage = result.error || result.message || "알 수 없는 오류";
-        console.error("[원클릭 인증 변경] 오류:", { status: response.status, result });
         alert(`인증 상태 변경 실패: ${errorMessage}`);
       }
     } catch (error: any) {
-      console.error("[원클릭 인증 변경] 예외:", error);
       alert(`인증 상태 변경 중 오류: ${error?.message || error}`);
     } finally {
       setUpdatingUserId(null);

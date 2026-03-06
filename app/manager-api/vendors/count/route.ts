@@ -72,14 +72,11 @@ export async function GET(request: NextRequest) {
     const { count, error } = await query;
 
     if (error) {
-      console.error("개수 조회 오류:", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    console.log("Count API 응답:", count);
     return NextResponse.json({ count: count || 0 });
   } catch (error) {
-    console.error("개수 조회 오류:", error);
     return NextResponse.json(
       { error: "서버 오류가 발생했습니다." },
       { status: 500 }

@@ -86,8 +86,6 @@ export async function extractKeywordsFromTitle(
     throw new Error("포스트 제목이 필요합니다.");
   }
 
-  console.log(`키워드 추출 시작: ${postTitle}`);
-
   const openai = getOpenAI();
 
   // ChatGPT를 사용하여 키워드 추출
@@ -130,8 +128,7 @@ export async function extractKeywordsFromTitle(
     if (!Array.isArray(keywords)) {
       throw new Error("키워드가 배열 형태가 아닙니다.");
     }
-  } catch (parseError) {
-    console.error("JSON 파싱 오류:", parseError);
+  } catch {
     // 백업: 텍스트에서 키워드 추출 시도
     keywords = extractKeywordsFromText(content);
   }
@@ -142,8 +139,6 @@ export async function extractKeywordsFromTitle(
     .map((keyword) => keyword.trim().replace(/["""]/g, ""))
     .filter((keyword) => keyword.length > 1 && keyword.length < 50)
     .slice(0, 15); // 최대 15개로 제한
-
-  console.log(`추출된 키워드 ${keywords.length}개:`, keywords);
 
   return {
     postTitle,

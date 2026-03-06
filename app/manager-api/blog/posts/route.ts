@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error("블로그 글 조회 실패:", error);
       return NextResponse.json({ error: "블로그 글 조회 실패" }, { status: 500 });
     }
 
@@ -63,7 +62,6 @@ export async function GET(request: NextRequest) {
       limit,
     });
   } catch (error) {
-    console.error("블로그 글 조회 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
@@ -104,7 +102,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (postError) {
-      console.error("블로그 글 생성 실패:", postError);
       return NextResponse.json({ error: "블로그 글 생성 실패" }, { status: 500 });
     }
 
@@ -119,7 +116,7 @@ export async function POST(request: NextRequest) {
         .insert(tagRelations);
 
       if (tagError) {
-        console.error("태그 연결 실패:", tagError);
+        // 태그 연결 실패 시 무시
       }
     }
 
@@ -147,17 +144,14 @@ export async function POST(request: NextRequest) {
             reason: data.reason ?? data.message,
             error: data.error,
           };
-          if (!res.ok) console.error("알림 API 실패:", res.status, data);
         } catch (err) {
           notify = { called: true, ok: false, error: err instanceof Error ? err.message : "네트워크 오류" };
-          console.error("알림 API 호출 오류:", err);
         }
       }
     }
 
     return NextResponse.json({ success: true, post, notify });
   } catch (error) {
-    console.error("블로그 글 생성 중 오류:", error);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
