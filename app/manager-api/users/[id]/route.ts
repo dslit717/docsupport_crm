@@ -148,9 +148,11 @@ export async function PATCH(
             },
             body: JSON.stringify({ user_id: id }),
           });
+          const resBody = await res.json().catch(() => ({}));
           if (!res.ok) {
-            const errBody = await res.text();
-            console.error("[환영 카톡] docsupport API 오류:", res.status, errBody);
+            console.error("[환영 카톡] docsupport API 오류:", res.status, resBody);
+          } else if ((resBody as { sentAs?: string }).sentAs === "sms") {
+            console.error("[환영 카톡] 알림톡 실패, SMS로 대체됨. Solapi 에러:", (resBody as { kakaoError?: unknown }).kakaoError);
           }
         } catch (e) {
           console.error("[환영 카톡] docsupport API 호출 실패:", e);
