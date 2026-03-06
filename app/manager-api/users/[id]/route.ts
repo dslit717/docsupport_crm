@@ -87,14 +87,17 @@ export async function PATCH(
     }
 
     // user_info 테이블 업데이트 (의사 인증 상태)
+    let shouldSendWelcomeMessage = false;
     if (is_doctor_verified !== undefined) {
-      // user_info 레코드 존재 확인
+      // 기존 인증 상태 조회 (false/null → true 전환 시에만 환영 카톡 발송)
       const { data: existingInfo } = await supabase
         .from("user_info")
-        .select("id")
+        .select("id, is_doctor_verified")
         .eq("user_id", id)
         .single();
 
+      const wasNotVerified =
+        !existingInfo || existingInfo.is_doctor_verified === false || existingInfo.is_doctor_verified === null;
       if (existingInfo) {
         // 기존 레코드 업데이트
         const { error: infoError } = await supabase
@@ -109,6 +112,9 @@ export async function PATCH(
           console.error("user_info 테이블 업데이트 오류:", infoError);
           return createErrorResponse(infoError, 500, "의사 인증 상태 업데이트 오류");
         }
+        if (is_doctor_verified === true && wasNotVerified) {
+          shouldSendWelcomeMessage = true;
+        }
       } else {
         // 새 레코드 생성
         const { error: insertError } = await supabase
@@ -122,6 +128,35 @@ export async function PATCH(
           console.error("user_info 레코드 생성 오류:", insertError);
           return createErrorResponse(insertError, 500, "의사 인증 상태 생성 오류");
         }
+        if (is_doctor_verified === true) {
+          shouldSendWelcomeMessage = true;
+        }
+      }
+    }
+
+    // 의사 인증 승인 시 docsupport 환영 카톡 API 호출
+    if (shouldSendWelcomeMessage) {
+      const docsupportUrl = process.env.DOCSUPPORT_SITE_URL || "https://docsupport.kr";
+      const blogAdminKey = process.env.BLOG_ADMIN_API_KEY;
+      if (blogAdminKey) {
+        try {
+          const res = await fetch(`${docsupportUrl}/api/admin/approve-doctor`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-admin-key": blogAdminKey,
+            },
+            body: JSON.stringify({ user_id: id }),
+          });
+          if (!res.ok) {
+            const errBody = await res.text();
+            console.error("[환영 카톡] docsupport API 오류:", res.status, errBody);
+          }
+        } catch (e) {
+          console.error("[환영 카톡] docsupport API 호출 실패:", e);
+        }
+      } else {
+        console.warn("[환영 카톡] BLOG_ADMIN_API_KEY 미설정. CRM .env에 추가하세요.");
       }
     }
 

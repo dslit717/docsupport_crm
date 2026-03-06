@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const docsupportUrl = process.env.DOCSUPPORT_SITE_URL || "https://docsupport.vercel.app";
+    const docsupportUrl = process.env.DOCSUPPORT_SITE_URL || "https://docsupport.kr";
     const blogAdminKey = process.env.BLOG_ADMIN_API_KEY;
     let notify: { called: boolean; ok?: boolean; status?: number; subscriberCount?: number; sentCount?: number; reason?: string; error?: string } = { called: false };
 
